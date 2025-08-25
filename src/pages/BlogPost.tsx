@@ -45,7 +45,7 @@ const BlogPost = () => {
         </ul>
         
         <h3>2. Strategic Stock Option and RSU Planning</h3>
-        <p>Tech professionals and executives with equity compensation should consider:</p>
+        <p>Tech professionals and executives with equity compensation should consider our specialized <a href="/services/rsu-equity-planning" style="color: hsl(var(--primary)); text-decoration: underline;">RSU & Equity Planning services</a>:</p>
         <ul>
           <li><strong>RSU Vesting Timing:</strong> Optimize tax brackets across multiple years</li>
           <li><strong>ISO Exercise Strategies:</strong> Minimize Alternative Minimum Tax (AMT) impact</li>
@@ -106,7 +106,7 @@ const BlogPost = () => {
         <h2>Conclusion</h2>
         <p>Effective tax planning for high-income professionals requires a proactive, year-round approach that integrates with your overall financial strategy. The strategies outlined above can result in significant tax savings, but implementation should be customized to your specific situation.</p>
         
-        <p><strong>Next Steps:</strong> Work with qualified tax and financial professionals to develop a comprehensive plan that maximizes these opportunities while ensuring compliance with all applicable regulations.</p>
+        <p><strong>Next Steps:</strong> Work with our experienced <a href="/services/tax-planning-prep" style="color: hsl(var(--primary)); text-decoration: underline;">Tax Planning & Preparation</a> team to develop a comprehensive plan that maximizes these opportunities while ensuring compliance with all applicable regulations. Schedule your <a href="/book-consultation" style="color: hsl(var(--primary)); text-decoration: underline;">consultation today</a>.</p>
       `
     },
     "rd-tax-credits-hidden-opportunities-tech-companies": {
@@ -214,7 +214,7 @@ const BlogPost = () => {
         <h2>Conclusion</h2>
         <p>R&D tax credits represent a significant opportunity for technology companies to reduce their tax liability while investing in innovation. The key to success is proper identification, documentation, and claiming of qualifying activities.</p>
         
-        <p><strong>Take Action:</strong> Begin by conducting an R&D credit study to identify qualifying activities and quantify potential benefits. Work with experienced tax professionals to maximize your credit while ensuring full compliance with IRS requirements.</p>
+        <p><strong>Take Action:</strong> Begin by conducting an R&D credit study to identify qualifying activities and quantify potential benefits. Our <a href="/services/tax-planning-prep" style="color: hsl(var(--primary)); text-decoration: underline;">Tax Planning & Preparation</a> team specializes in R&D credits for tech companies. Work with experienced tax professionals to maximize your credit while ensuring full compliance with IRS requirements. <a href="/contact" style="color: hsl(var(--primary)); text-decoration: underline;">Contact us</a> to get started.</p>
       `
     },
     "estate-planning-multi-generational-families": {
@@ -344,7 +344,7 @@ const BlogPost = () => {
         <h2>Conclusion</h2>
         <p>Multi-generational estate planning requires sophisticated strategies that balance tax efficiency with family objectives. The window for utilizing current favorable exemption amounts may be limited, making prompt action advisable for many families.</p>
         
-        <p><strong>Next Steps:</strong> Engage experienced estate planning professionals to conduct a comprehensive analysis of your family situation and develop a customized multi-generational wealth preservation strategy.</p>
+        <p><strong>Next Steps:</strong> Engage our experienced <a href="/services/estate-planning-coordination" style="color: hsl(var(--primary)); text-decoration: underline;">Estate Planning Coordination</a> team to conduct a comprehensive analysis of your family situation and develop a customized multi-generational wealth preservation strategy. <a href="/book-consultation" style="color: hsl(var(--primary)); text-decoration: underline;">Schedule your consultation</a> today.</p>
       `
     },
     "key-tax-law-changes-2025-business-owners": {
@@ -505,7 +505,7 @@ const BlogPost = () => {
         <h2>Conclusion</h2>
         <p>The 2025 tax law changes present both challenges and opportunities for business owners. Those who proactively adapt their strategies can achieve significant tax savings while maintaining compliance with new requirements.</p>
         
-        <p><strong>Take Action:</strong> Review your current tax strategy with qualified professionals to ensure you are positioned to take advantage of new opportunities while addressing compliance challenges. Early planning is essential for maximizing benefits under the new rules.</p>
+        <p><strong>Take Action:</strong> Review your current tax strategy with our qualified <a href="/services/tax-planning-prep" style="color: hsl(var(--primary)); text-decoration: underline;">Tax Planning & Preparation</a> professionals to ensure you are positioned to take advantage of new opportunities while addressing compliance challenges. We also offer specialized <a href="/business-services" style="color: hsl(var(--primary)); text-decoration: underline;">business services</a> to help with implementation. Early planning is essential for maximizing benefits under the new rules.</p>
       `
     },
     "rsu-tax-planning-timing-stock-vesting-maximum-benefit": {
@@ -585,6 +585,7 @@ const BlogPost = () => {
           <li><strong>Mega Backdoor Roth:</strong> After-tax 401(k) contributions and conversions</li>
           <li><strong>HSA Maximization:</strong> Triple tax advantage for medical expenses</li>
         </ul>
+        <p>Learn more about our comprehensive <a href="/services/individual-tax-preparation" style="color: hsl(var(--primary)); text-decoration: underline;">Individual Tax Preparation</a> services that include retirement planning strategies.</p>
         
         <h2>Company-Specific Considerations</h2>
         
@@ -675,7 +676,7 @@ const BlogPost = () => {
         <h2>Conclusion</h2>
         <p>Effective RSU tax planning requires a comprehensive approach that considers timing, geography, and coordination with other financial strategies. The key is proactive planning that begins well before vesting events occur.</p>
         
-        <p><strong>Next Steps:</strong> Work with qualified tax and financial professionals to develop a customized RSU management strategy that aligns with your overall financial goals and tax optimization objectives.</p>
+        <p><strong>Next Steps:</strong> Work with our specialized <a href="/services/rsu-equity-planning" style="color: hsl(var(--primary)); text-decoration: underline;">RSU & Equity Planning</a> team to develop a customized RSU management strategy that aligns with your overall financial goals and tax optimization objectives. <a href="/book-consultation" style="color: hsl(var(--primary)); text-decoration: underline;">Schedule your consultation</a> today.</p>
       `
     },
     "small-business-tax-deductions-you-might-be-missing": {
@@ -787,6 +788,7 @@ const BlogPost = () => {
           <li><strong>SIMPLE IRA:</strong> Lower contribution limits but easier administration</li>
           <li><strong>Defined Benefit Plans:</strong> Potentially much higher contributions for stable, high-income businesses</li>
         </ul>
+        <p>Our <a href="/services/full-service-accounting-payroll" style="color: hsl(var(--primary)); text-decoration: underline;">Full-Service Accounting & Payroll</a> team can help set up and manage these retirement plans for your business.</p>
         
         <h3>Health and Welfare Benefits</h3>
         <ul>
@@ -857,6 +859,7 @@ const BlogPost = () => {
           <li><strong>Multi-State Operations:</strong> Nexus and apportionment issues</li>
           <li><strong>Growth Planning:</strong> Tax strategies for scaling businesses</li>
         </ul>
+        <p>Consider our comprehensive <a href="/business-services" style="color: hsl(var(--primary)); text-decoration: underline;">business services</a> including <a href="/services/cfo-consulting" style="color: hsl(var(--primary)); text-decoration: underline;">CFO Consulting</a> and <a href="/services/bookkeeping" style="color: hsl(var(--primary)); text-decoration: underline;">Bookkeeping</a> for ongoing support.</p>
         
         <h3>Maximizing Professional Relationships</h3>
         <ul>
@@ -869,7 +872,7 @@ const BlogPost = () => {
         <h2>Conclusion</h2>
         <p>Small business tax deductions can significantly reduce your tax liability when properly identified, documented, and claimed. The key is establishing good record-keeping habits and staying informed about available opportunities.</p>
         
-        <p><strong>Take Action:</strong> Review your current expense tracking systems and implement improvements where needed. Schedule a consultation with a qualified tax professional to identify additional deduction opportunities specific to your business and industry.</p>
+        <p><strong>Take Action:</strong> Review your current expense tracking systems and implement improvements where needed. Our <a href="/services/bookkeeping" style="color: hsl(var(--primary)); text-decoration: underline;">Bookkeeping</a> and <a href="/services/tax-planning-prep" style="color: hsl(var(--primary)); text-decoration: underline;">Tax Planning & Preparation</a> teams can help identify additional deduction opportunities specific to your business and industry. <a href="/book-consultation" style="color: hsl(var(--primary)); text-decoration: underline;">Schedule a consultation</a> today.</p>
       `
     }
   };
