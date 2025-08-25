@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -103,7 +104,14 @@ const Blog = () => {
   const regularPosts = blogPosts.filter(post => !post.featured);
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Helmet>
+        <title>Tax & Business Blog | Expert CPA Insights | HRX CPAs Irvine</title>
+        <meta name="description" content="Expert tax planning, business strategy, and financial insights from HRX CPAs. Stay updated on tax law changes, business tips, and financial planning strategies." />
+        <meta name="keywords" content="CPA blog Irvine, tax planning tips, business finance blog, tax law updates, RSU tax strategies, exit planning insights" />
+        <link rel="canonical" href="https://hrxcpas.com/blog" />
+      </Helmet>
+      <div className="min-h-screen bg-background">
       <Header />
       <main className="pt-20">
         {/* Hero Section */}
@@ -359,7 +367,8 @@ const Blog = () => {
         </section>
       </main>
       <Footer />
-    </div>
+      </div>
+    </>
   );
 };
 
