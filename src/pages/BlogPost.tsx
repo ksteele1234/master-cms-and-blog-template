@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -904,6 +905,66 @@ const BlogPost = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>{currentPost.title} | HRX CPAs Blog</title>
+        <meta name="description" content={currentPost.excerpt} />
+        <meta name="keywords" content={`${currentPost.category.toLowerCase()}, tax planning, business advice, CPA insights`} />
+        <link rel="canonical" href={`https://hrxcpas.com/blog/${currentPost.slug}`} />
+        
+        {/* Article Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": currentPost.title,
+            "description": currentPost.excerpt,
+            "image": currentPost.image,
+            "datePublished": new Date(currentPost.date).toISOString(),
+            "dateModified": new Date(currentPost.date).toISOString(),
+            "author": {
+              "@type": currentPost.author.includes("HRX CPAs Team") ? "Organization" : "Person",
+              "name": currentPost.author,
+              ...(currentPost.author.includes("Hiren Parmar") && {
+                "jobTitle": "CPA, Founder & President",
+                "worksFor": {
+                  "@type": "Organization",
+                  "name": "HRX CPAs"
+                }
+              })
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "HRX CPAs",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://hrxcpas.com/assets/hrx-logo.png"
+              }
+            },
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": `https://hrxcpas.com/blog/${currentPost.slug}`
+            },
+            "articleSection": currentPost.category,
+            "wordCount": parseInt(currentPost.readTime.split(' ')[0]) * 250, // Estimated based on read time
+            "inLanguage": "en-US",
+            "about": [
+              {
+                "@type": "Thing",
+                "name": currentPost.category
+              },
+              {
+                "@type": "Thing", 
+                "name": "Tax Planning"
+              },
+              {
+                "@type": "Thing",
+                "name": "Business Advisory"
+              }
+            ],
+            "keywords": `${currentPost.category}, tax planning, business advice, CPA insights, ${currentPost.title.toLowerCase()}`
+          })}
+        </script>
+        </Helmet>
       <Header />
       <main className="pt-20 pb-16">
         {/* Article Header */}
