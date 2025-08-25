@@ -1017,6 +1017,10 @@ const BlogPost = () => {
                         src={post.image} 
                         alt={post.title}
                         className="w-full h-full object-cover"
+                        width="400"
+                        height="300"
+                        loading="lazy"
+                        decoding="async"
                       />
                     </div>
                     <div className="p-6">
