@@ -6,6 +6,14 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Link, useParams } from "react-router-dom";
 
+// Blog post images
+import taxPlanningImage from "@/assets/blog/tax-planning-high-income-professionals.jpg";
+import rdCreditsImage from "@/assets/blog/rd-tax-credits-tech-companies.jpg";
+import estatePlanningImage from "@/assets/blog/estate-planning-multi-generational.jpg";
+import taxLawChangesImage from "@/assets/blog/tax-law-changes-2025.jpg";
+import rsuPlanningImage from "@/assets/blog/rsu-tax-planning-stock-vesting.jpg";
+import businessDeductionsImage from "@/assets/blog/small-business-tax-deductions.jpg";
+
 const BlogPost = () => {
   const { slug } = useParams();
   
@@ -20,6 +28,7 @@ const BlogPost = () => {
       category: "Tax Planning",
       readTime: "8 min read",
       excerpt: "Maximize your tax savings with strategic planning techniques specifically designed for executives, doctors, and tech professionals earning $300K+.",
+      image: taxPlanningImage,
       content: `
         <h2>Introduction</h2>
         <p>High-income professionals face unique tax challenges that require sophisticated planning strategies. As we approach 2025, several key opportunities can help maximize your tax efficiency while building long-term wealth.</p>
@@ -71,6 +80,7 @@ const BlogPost = () => {
       category: "Business Growth",
       readTime: "6 min read",
       excerpt: "Learn how software companies can claim substantial R&D tax credits, including common qualifying activities and documentation requirements.",
+      image: rdCreditsImage,
       content: `
         <h2>Understanding R&D Tax Credits</h2>
         <p>The Research and Development Tax Credit is one of the most valuable yet underutilized tax incentives available to businesses. For technology companies, this credit can provide substantial tax savings.</p>
@@ -118,6 +128,7 @@ const BlogPost = () => {
       category: "Estate Planning",
       readTime: "10 min read",
       excerpt: "Essential strategies for preserving wealth across generations, including trust structures, gift strategies, and tax optimization.",
+      image: estatePlanningImage,
       content: `
         <h2>Building a Multi-Generational Legacy</h2>
         <p>Creating an estate plan that effectively preserves wealth across multiple generations requires sophisticated strategies and careful coordination with qualified professionals.</p>
@@ -166,6 +177,7 @@ const BlogPost = () => {
       category: "Tax Law Updates",
       readTime: "7 min read",
       excerpt: "Stay ahead of important tax law modifications affecting businesses, including new depreciation rules and enhanced credits.",
+      image: taxLawChangesImage,
       content: `
         <h2>2025 Tax Law Updates Overview</h2>
         <p>Several significant tax law changes take effect in 2025 that will impact business planning and compliance. Here's what you need to know to stay ahead.</p>
@@ -222,6 +234,7 @@ const BlogPost = () => {
       category: "Tax Planning",
       readTime: "9 min read",
       excerpt: "Strategic approaches to managing restricted stock unit taxation, including timing strategies and AMT considerations.",
+      image: rsuPlanningImage,
       content: `
         <h2>Understanding RSU Taxation</h2>
         <p>Restricted Stock Units (RSUs) are a common form of equity compensation, particularly in the technology sector. Understanding their tax implications is crucial for maximizing after-tax value.</p>
@@ -274,6 +287,7 @@ const BlogPost = () => {
       category: "Small Business",
       readTime: "5 min read",
       excerpt: "Comprehensive guide to often-overlooked business deductions that can significantly reduce your tax liability.",
+      image: businessDeductionsImage,
       content: `
         <h2>Maximizing Small Business Deductions</h2>
         <p>Many small business owners miss valuable deductions that could significantly reduce their tax liability. Here are some commonly overlooked opportunities.</p>
@@ -466,8 +480,12 @@ const BlogPost = () => {
                 .slice(0, 3)
                 .map(([postSlug, post]) => (
                   <Card key={postSlug} className="overflow-hidden hover:shadow-lg transition-shadow">
-                    <div className="aspect-video bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center">
-                      <BookOpen className="h-12 w-12 text-primary/40" />
+                    <div className="aspect-video">
+                      <img 
+                        src={post.image} 
+                        alt={post.title}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                     <div className="p-6">
                       <Badge variant="secondary" className="mb-3">

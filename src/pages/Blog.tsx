@@ -7,6 +7,14 @@ import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
+// Blog post images
+import taxPlanningImage from "@/assets/blog/tax-planning-high-income-professionals.jpg";
+import rdCreditsImage from "@/assets/blog/rd-tax-credits-tech-companies.jpg";
+import estatePlanningImage from "@/assets/blog/estate-planning-multi-generational.jpg";
+import taxLawChangesImage from "@/assets/blog/tax-law-changes-2025.jpg";
+import rsuPlanningImage from "@/assets/blog/rsu-tax-planning-stock-vesting.jpg";
+import businessDeductionsImage from "@/assets/blog/small-business-tax-deductions.jpg";
+
 const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
@@ -23,7 +31,7 @@ const Blog = () => {
       category: "Tax Planning",
       readTime: "8 min read",
       featured: true,
-      image: "/placeholder.svg"
+      image: taxPlanningImage
     },
     {
       id: 2,
@@ -35,7 +43,7 @@ const Blog = () => {
       category: "Business Growth",
       readTime: "6 min read",
       featured: false,
-      image: "/placeholder.svg"
+      image: rdCreditsImage
     },
     {
       id: 3,
@@ -47,7 +55,7 @@ const Blog = () => {
       category: "Estate Planning",
       readTime: "10 min read",
       featured: false,
-      image: "/placeholder.svg"
+      image: estatePlanningImage
     },
     {
       id: 4,
@@ -59,7 +67,7 @@ const Blog = () => {
       category: "Tax Law Updates",
       readTime: "7 min read",
       featured: false,
-      image: "/placeholder.svg"
+      image: taxLawChangesImage
     },
     {
       id: 5,
@@ -71,7 +79,7 @@ const Blog = () => {
       category: "Tax Planning",
       readTime: "9 min read",
       featured: false,
-      image: "/placeholder.svg"
+      image: rsuPlanningImage
     },
     {
       id: 6,
@@ -83,7 +91,7 @@ const Blog = () => {
       category: "Small Business",
       readTime: "5 min read",
       featured: false,
-      image: "/placeholder.svg"
+      image: businessDeductionsImage
     }
   ];
 
@@ -158,8 +166,12 @@ const Blog = () => {
               </h2>
               <Card className="overflow-hidden border-2 border-primary/20">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-                  <div className="aspect-video lg:aspect-auto bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
-                    <Calculator className="h-24 w-24 text-primary/40" />
+                  <div className="aspect-video lg:aspect-auto">
+                    <img 
+                      src={featuredPost.image} 
+                      alt={featuredPost.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="p-8">
                     <Badge variant="default" className="mb-4">Featured</Badge>
@@ -203,8 +215,12 @@ const Blog = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {(selectedCategory === "All" ? regularPosts : filteredPosts).map((post) => (
                 <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="aspect-video bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center">
-                    <Calculator className="h-12 w-12 text-primary/40" />
+                  <div className="aspect-video">
+                    <img 
+                      src={post.image} 
+                      alt={post.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="p-6">
                     <Badge variant="secondary" className="mb-3">
