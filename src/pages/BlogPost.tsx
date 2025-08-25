@@ -78,7 +78,7 @@ const BlogPost = () => {
         </div>
         
         <h3>2. Strategic Stock Option and RSU Planning</h3>
-        <p>Tech professionals and executives with equity compensation should consider our specialized <a href="/services/rsu-equity-planning" style="color: #64a0d0; text-decoration: underline;">RSU & Equity Planning services</a>:</p>
+        <p>Tech professionals and executives with equity compensation should consider our specialized <Link to="/services/rsu-equity-planning" className="text-primary hover:text-primary/80 underline">RSU & Equity Planning services</Link>:</p>
         
         <div class="case-study-box">
           <h4>Case Study: Tech Executive Success</h4>
@@ -155,7 +155,7 @@ const BlogPost = () => {
         <h2>Conclusion</h2>
         <p>Effective tax planning for high-income professionals requires a proactive, year-round approach that integrates with your overall financial strategy. The strategies outlined above can result in significant tax savings, but implementation should be customized to your specific situation.</p>
         
-        <p><strong>Next Steps:</strong> Work with our experienced <a href="/services/tax-planning-prep" style="color: #64a0d0; text-decoration: underline;">Tax Planning & Preparation</a> team to develop a comprehensive plan that maximizes these opportunities while ensuring compliance with all applicable regulations. Schedule your <a href="/book-consultation" style="color: #64a0d0; text-decoration: underline;">consultation today</a>.</p>
+        <p><strong>Next Steps:</strong> Work with our experienced <Link to="/services/tax-planning-prep" className="text-primary hover:text-primary/80 underline">Tax Planning & Preparation</Link> team to develop a comprehensive plan that maximizes these opportunities while ensuring compliance with all applicable regulations. Schedule your <Link to="/book-consultation" className="text-primary hover:text-primary/80 underline">consultation today</Link>.</p>
       `
     },
     "rd-tax-credits-hidden-opportunities-tech-companies": {
@@ -309,7 +309,7 @@ const BlogPost = () => {
         <h2>Conclusion</h2>
         <p>R&D tax credits represent a significant opportunity for technology companies to reduce their tax liability while investing in innovation. The key to success is proper identification, documentation, and claiming of qualifying activities.</p>
         
-        <p><strong>Take Action:</strong> Begin by conducting an R&D credit study to identify qualifying activities and quantify potential benefits. Our <a href="/services/tax-planning-prep" style="color: #64a0d0; text-decoration: underline;">Tax Planning & Preparation</a> team specializes in R&D credits for tech companies. Work with experienced tax professionals to maximize your credit while ensuring full compliance with IRS requirements. <a href="/contact" style="color: #64a0d0; text-decoration: underline;">Contact us</a> to get started.</p>
+        <p><strong>Take Action:</strong> Begin by conducting an R&D credit study to identify qualifying activities and quantify potential benefits. Our <Link to="/services/tax-planning-prep" className="text-primary hover:text-primary/80 underline">Tax Planning & Preparation</Link> team specializes in R&D credits for tech companies. Work with experienced tax professionals to maximize your credit while ensuring full compliance with IRS requirements. <Link to="/contact" className="text-primary hover:text-primary/80 underline">Contact us</Link> to get started.</p>
       `
     },
     "estate-planning-multi-generational-families": {
@@ -384,7 +384,7 @@ const BlogPost = () => {
         <h2>Conclusion</h2>
         <p>Multi-generational estate planning requires careful coordination of legal, tax, and family considerations. The strategies outlined above can help preserve wealth across generations while minimizing tax burdens.</p>
         
-        <p><strong>Next Steps:</strong> Work with our experienced <a href="/services/estate-planning-coordination" style="color: #64a0d0; text-decoration: underline;">Estate Planning Coordination</a> team to develop a comprehensive plan. Schedule your <a href="/book-consultation" style="color: #64a0d0; text-decoration: underline;">consultation today</a>.</p>
+        <p><strong>Next Steps:</strong> Work with our experienced <Link to="/services/estate-planning-coordination" className="text-primary hover:text-primary/80 underline">Estate Planning Coordination</Link> team to develop a comprehensive plan. Schedule your <Link to="/book-consultation" className="text-primary hover:text-primary/80 underline">consultation today</Link>.</p>
       `
     },
     "key-tax-law-changes-2025-business-owners": {
