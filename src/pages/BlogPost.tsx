@@ -12,20 +12,20 @@ const BlogPost = () => {
   // Sample blog posts data
   const blogPosts = {
     "1": {
-      title: "2024 Tax Planning Strategies for High-Income Professionals",
+      title: "2025 Tax Planning Strategies for High-Income Professionals",
       author: "Hiren Parmar, CPA",
-      date: "December 15, 2024",
+      date: "January 15, 2025",
       category: "Tax Planning",
       readTime: "8 min read",
       excerpt: "Maximize your tax savings with strategic planning techniques specifically designed for executives, doctors, and tech professionals earning $300K+.",
       content: `
         <h2>Introduction</h2>
-        <p>High-income professionals face unique tax challenges that require sophisticated planning strategies. As we approach 2024, several key opportunities can help maximize your tax efficiency while building long-term wealth.</p>
+        <p>High-income professionals face unique tax challenges that require sophisticated planning strategies. As we approach 2025, several key opportunities can help maximize your tax efficiency while building long-term wealth.</p>
         
-        <h2>Key Strategies for 2024</h2>
+        <h2>Key Strategies for 2025</h2>
         
         <h3>1. Maximize Retirement Contributions</h3>
-        <p>For 2024, contribution limits have increased:</p>
+        <p>For 2025, contribution limits have increased:</p>
         <ul>
           <li>401(k): $23,000 ($30,500 if 50+)</li>
           <li>IRA: $7,000 ($8,000 if 50+)</li>
@@ -63,7 +63,7 @@ const BlogPost = () => {
     "2": {
       title: "R&D Tax Credits: Hidden Opportunities for Tech Companies",
       author: "HRX CPAs Team",
-      date: "December 12, 2024",
+      date: "January 12, 2025",
       category: "Business Growth",
       readTime: "6 min read",
       excerpt: "Learn how software companies can claim substantial R&D tax credits, including common qualifying activities and documentation requirements.",
