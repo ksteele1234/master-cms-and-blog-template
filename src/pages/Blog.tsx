@@ -110,6 +110,29 @@ const Blog = () => {
         <meta name="description" content="Expert tax planning, business strategy, and financial insights from HRX CPAs. Stay updated on tax law changes, business tips, and financial planning strategies." />
         <meta name="keywords" content="CPA blog Irvine, tax planning tips, business finance blog, tax law updates, RSU tax strategies, exit planning insights" />
         <link rel="canonical" href="https://hrxcpas.com/blog" />
+        
+        {/* Open Graph Tags */}
+        <meta property="og:title" content="Tax & Business Blog | Expert CPA Insights from HRX CPAs" />
+        <meta property="og:description" content="Expert tax planning, business strategy, and financial insights from HRX CPAs. Stay updated on tax law changes, business tips, and financial planning strategies." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://hrxcpas.com/blog" />
+        <meta property="og:image" content="https://hrxcpas.com/assets/blog/tax-planning-high-income-professionals.jpg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:site_name" content="HRX CPAs" />
+        <meta property="og:locale" content="en_US" />
+        
+        {/* Twitter Card Tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Tax & Business Blog | Expert CPA Insights from HRX CPAs" />
+        <meta name="twitter:description" content="Expert tax planning, business strategy, and financial insights from HRX CPAs. Stay updated on tax law changes, business tips, and financial planning strategies." />
+        <meta name="twitter:image" content="https://hrxcpas.com/assets/blog/tax-planning-high-income-professionals.jpg" />
+        <meta name="twitter:image:alt" content="Tax planning strategies for high-income professionals" />
+        
+        {/* Additional Meta Tags */}
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+        <meta name="author" content="HRX CPAs" />
+        <meta name="theme-color" content="#1e40af" />
       </Helmet>
       <div className="min-h-screen bg-background">
       <Header />
