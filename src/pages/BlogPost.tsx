@@ -7,11 +7,13 @@ import Footer from "@/components/Footer";
 import { Link, useParams } from "react-router-dom";
 
 const BlogPost = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   
-  // Sample blog posts data
+  // Sample blog posts data with slug-based lookup
   const blogPosts = {
-    "1": {
+    "2025-tax-planning-strategies-high-income-professionals": {
+      id: 1,
+      slug: "2025-tax-planning-strategies-high-income-professionals",
       title: "2025 Tax Planning Strategies for High-Income Professionals",
       author: "Hiren Parmar, CPA",
       date: "January 15, 2025",
@@ -60,7 +62,9 @@ const BlogPost = () => {
         <p>Effective tax planning requires a proactive, year-round approach. Work with qualified professionals to implement these strategies based on your specific situation.</p>
       `
     },
-    "2": {
+    "rd-tax-credits-hidden-opportunities-tech-companies": {
+      id: 2,
+      slug: "rd-tax-credits-hidden-opportunities-tech-companies",
       title: "R&D Tax Credits: Hidden Opportunities for Tech Companies",
       author: "HRX CPAs Team",
       date: "January 12, 2025",
@@ -104,10 +108,227 @@ const BlogPost = () => {
         <h2>Getting Started</h2>
         <p>Begin by conducting an R&D credit study to identify qualifying activities and quantify potential benefits. Work with experienced professionals to maximize your credit while ensuring compliance.</p>
       `
+    },
+    "estate-planning-multi-generational-families": {
+      id: 3,
+      slug: "estate-planning-multi-generational-families",
+      title: "Estate Planning for Multi-Generational Families",
+      author: "Hiren Parmar, CPA",
+      date: "January 10, 2025",
+      category: "Estate Planning",
+      readTime: "10 min read",
+      excerpt: "Essential strategies for preserving wealth across generations, including trust structures, gift strategies, and tax optimization.",
+      content: `
+        <h2>Building a Multi-Generational Legacy</h2>
+        <p>Creating an estate plan that effectively preserves wealth across multiple generations requires sophisticated strategies and careful coordination with qualified professionals.</p>
+        
+        <h2>Trust Structures for Wealth Preservation</h2>
+        
+        <h3>Generation-Skipping Trusts</h3>
+        <ul>
+          <li>Bypass estate taxes for one generation</li>
+          <li>Maximize use of GST exemption</li>
+          <li>Provide flexibility for future distributions</li>
+        </ul>
+        
+        <h3>Dynasty Trusts</h3>
+        <ul>
+          <li>Perpetual wealth preservation where permitted</li>
+          <li>Protection from beneficiary creditors</li>
+          <li>Tax-efficient growth opportunities</li>
+        </ul>
+        
+        <h2>Strategic Gifting Programs</h2>
+        <p>Annual exclusion gifts and lifetime exemption utilization:</p>
+        <ul>
+          <li>2025 annual exclusion: $19,000 per recipient</li>
+          <li>Lifetime exemption: $13.99 million</li>
+          <li>Valuation discounts for family entities</li>
+        </ul>
+        
+        <h2>Tax Optimization Techniques</h2>
+        <ul>
+          <li>Grantor trust structures</li>
+          <li>Charitable lead and remainder trusts</li>
+          <li>Family limited partnerships</li>
+        </ul>
+        
+        <h2>Coordination with Business Succession</h2>
+        <p>For business-owning families, estate planning must integrate with succession planning to ensure both family wealth preservation and business continuity.</p>
+      `
+    },
+    "key-tax-law-changes-2025-business-owners": {
+      id: 4,
+      slug: "key-tax-law-changes-2025-business-owners",
+      title: "Key Tax Law Changes for 2025: What Business Owners Need to Know",
+      author: "Renee Noseda, Senior Tax Manager",
+      date: "January 8, 2025",
+      category: "Tax Law Updates",
+      readTime: "7 min read",
+      excerpt: "Stay ahead of important tax law modifications affecting businesses, including new depreciation rules and enhanced credits.",
+      content: `
+        <h2>2025 Tax Law Updates Overview</h2>
+        <p>Several significant tax law changes take effect in 2025 that will impact business planning and compliance. Here's what you need to know to stay ahead.</p>
+        
+        <h2>Depreciation and Expensing Changes</h2>
+        
+        <h3>Section 199A Deduction</h3>
+        <ul>
+          <li>Continued availability for pass-through entities</li>
+          <li>Updated income thresholds</li>
+          <li>New qualifying business activities</li>
+        </ul>
+        
+        <h3>Bonus Depreciation Phase-Out</h3>
+        <ul>
+          <li>80% bonus depreciation for 2025</li>
+          <li>Planning opportunities before full phase-out</li>
+          <li>Alternative timing strategies</li>
+        </ul>
+        
+        <h2>Enhanced Tax Credits</h2>
+        
+        <h3>Research & Development Credits</h3>
+        <ul>
+          <li>Expanded qualifying activities</li>
+          <li>Simplified documentation requirements</li>
+          <li>Increased credit rates for small businesses</li>
+        </ul>
+        
+        <h3>Green Energy Incentives</h3>
+        <ul>
+          <li>Extended solar and wind credits</li>
+          <li>New electric vehicle fleet incentives</li>
+          <li>Energy-efficient building improvements</li>
+        </ul>
+        
+        <h2>International Tax Provisions</h2>
+        <ul>
+          <li>GILTI rate modifications</li>
+          <li>Updated transfer pricing guidelines</li>
+          <li>New reporting requirements</li>
+        </ul>
+        
+        <h2>Action Items for Business Owners</h2>
+        <p>Review your current tax strategy with qualified professionals to ensure you're positioned to take advantage of new opportunities while maintaining compliance.</p>
+      `
+    },
+    "rsu-tax-planning-timing-stock-vesting-maximum-benefit": {
+      id: 5,
+      slug: "rsu-tax-planning-timing-stock-vesting-maximum-benefit",
+      title: "RSU Tax Planning: Timing Your Stock Vesting for Maximum Benefit",
+      author: "HRX CPAs Team",
+      date: "January 5, 2025",
+      category: "Tax Planning",
+      readTime: "9 min read",
+      excerpt: "Strategic approaches to managing restricted stock unit taxation, including timing strategies and AMT considerations.",
+      content: `
+        <h2>Understanding RSU Taxation</h2>
+        <p>Restricted Stock Units (RSUs) are a common form of equity compensation, particularly in the technology sector. Understanding their tax implications is crucial for maximizing after-tax value.</p>
+        
+        <h2>Vesting and Tax Events</h2>
+        
+        <h3>When Taxes Are Owed</h3>
+        <ul>
+          <li>Ordinary income tax at vesting</li>
+          <li>Withholding requirements and supplemental rates</li>
+          <li>Capital gains treatment for post-vesting appreciation</li>
+        </ul>
+        
+        <h3>Timing Strategies</h3>
+        <ul>
+          <li>Managing vesting across tax years</li>
+          <li>Coordinating with other income sources</li>
+          <li>State tax considerations for relocating employees</li>
+        </ul>
+        
+        <h2>Advanced Planning Techniques</h2>
+        
+        <h3>Tax Loss Harvesting</h3>
+        <ul>
+          <li>Offsetting RSU income with realized losses</li>
+          <li>Wash sale rule considerations</li>
+          <li>Portfolio rebalancing opportunities</li>
+        </ul>
+        
+        <h3>Charitable Giving Strategies</h3>
+        <ul>
+          <li>Donating appreciated shares</li>
+          <li>Charitable remainder trusts</li>
+          <li>Donor-advised funds for flexible timing</li>
+        </ul>
+        
+        <h2>AMT Considerations</h2>
+        <p>While RSUs don't typically trigger AMT, the interaction with other equity compensation and high income levels requires careful analysis.</p>
+        
+        <h2>Case Study Examples</h2>
+        <p>Review common scenarios for tech employees and executives, including optimal strategies for different vesting schedules and stock price movements.</p>
+      `
+    },
+    "small-business-tax-deductions-you-might-be-missing": {
+      id: 6,
+      slug: "small-business-tax-deductions-you-might-be-missing",
+      title: "Small Business Tax Deductions You Might Be Missing",
+      author: "HRX CPAs Team",
+      date: "January 3, 2025",
+      category: "Small Business",
+      readTime: "5 min read",
+      excerpt: "Comprehensive guide to often-overlooked business deductions that can significantly reduce your tax liability.",
+      content: `
+        <h2>Maximizing Small Business Deductions</h2>
+        <p>Many small business owners miss valuable deductions that could significantly reduce their tax liability. Here are some commonly overlooked opportunities.</p>
+        
+        <h2>Home Office Deductions</h2>
+        
+        <h3>Simplified Method vs. Actual Expense</h3>
+        <ul>
+          <li>$5 per square foot up to 300 sq ft (simplified)</li>
+          <li>Actual expenses based on percentage of home use</li>
+          <li>Direct vs. indirect expense categorization</li>
+        </ul>
+        
+        <h2>Vehicle Expenses</h2>
+        
+        <h3>Standard Mileage vs. Actual Costs</h3>
+        <ul>
+          <li>2025 standard mileage rate: 70 cents per mile</li>
+          <li>Actual expense method for higher-value vehicles</li>
+          <li>Record-keeping requirements</li>
+        </ul>
+        
+        <h2>Often-Missed Deductions</h2>
+        
+        <h3>Business Meals and Entertainment</h3>
+        <ul>
+          <li>100% deduction for employee meals (through 2025)</li>
+          <li>50% deduction for client entertainment</li>
+          <li>Business travel meal allowances</li>
+        </ul>
+        
+        <h3>Professional Development</h3>
+        <ul>
+          <li>Industry conferences and training</li>
+          <li>Professional memberships</li>
+          <li>Business-related education</li>
+        </ul>
+        
+        <h3>Technology and Equipment</h3>
+        <ul>
+          <li>Section 179 expensing election</li>
+          <li>Bonus depreciation opportunities</li>
+          <li>Software and subscription services</li>
+        </ul>
+        
+        <h2>Record-Keeping Best Practices</h2>
+        <p>Proper documentation is essential for claiming deductions. Implement systems to track expenses throughout the year rather than scrambling at tax time.</p>
+        
+        <h2>Working with Professionals</h2>
+        <p>A qualified tax advisor can help identify additional opportunities specific to your industry and business structure.</p>
+      `
     }
   };
 
-  const currentPost = blogPosts[id as keyof typeof blogPosts];
+  const currentPost = blogPosts[slug as keyof typeof blogPosts];
 
   if (!currentPost) {
     return (
@@ -241,10 +462,10 @@ const BlogPost = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {Object.entries(blogPosts)
-                .filter(([postId]) => postId !== id)
+                .filter(([postSlug]) => postSlug !== slug)
                 .slice(0, 3)
-                .map(([postId, post]) => (
-                  <Card key={postId} className="overflow-hidden hover:shadow-lg transition-shadow">
+                .map(([postSlug, post]) => (
+                  <Card key={postSlug} className="overflow-hidden hover:shadow-lg transition-shadow">
                     <div className="aspect-video bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center">
                       <BookOpen className="h-12 w-12 text-primary/40" />
                     </div>
@@ -261,7 +482,7 @@ const BlogPost = () => {
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">{post.readTime}</span>
                         <Button asChild variant="outline" size="sm">
-                          <Link to={`/blog/${postId}`}>
+                          <Link to={`/blog/${post.slug}`}>
                             Read More
                           </Link>
                         </Button>

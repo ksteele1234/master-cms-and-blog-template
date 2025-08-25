@@ -15,6 +15,7 @@ const Blog = () => {
   const blogPosts = [
     {
       id: 1,
+      slug: "2025-tax-planning-strategies-high-income-professionals",
       title: "2025 Tax Planning Strategies for High-Income Professionals",
       excerpt: "Maximize your tax savings with strategic planning techniques specifically designed for executives, doctors, and tech professionals earning $300K+.",
       author: "Hiren Parmar, CPA",
@@ -26,6 +27,7 @@ const Blog = () => {
     },
     {
       id: 2,
+      slug: "rd-tax-credits-hidden-opportunities-tech-companies",
       title: "R&D Tax Credits: Hidden Opportunities for Tech Companies",
       excerpt: "Learn how software companies can claim substantial R&D tax credits, including common qualifying activities and documentation requirements.",
       author: "HRX CPAs Team",
@@ -37,6 +39,7 @@ const Blog = () => {
     },
     {
       id: 3,
+      slug: "estate-planning-multi-generational-families",
       title: "Estate Planning for Multi-Generational Families",
       excerpt: "Essential strategies for preserving wealth across generations, including trust structures, gift strategies, and tax optimization.",
       author: "Hiren Parmar, CPA",
@@ -48,6 +51,7 @@ const Blog = () => {
     },
     {
       id: 4,
+      slug: "key-tax-law-changes-2025-business-owners",
       title: "Key Tax Law Changes for 2025: What Business Owners Need to Know",
       excerpt: "Stay ahead of important tax law modifications affecting businesses, including new depreciation rules and enhanced credits.",
       author: "Renee Noseda, Senior Tax Manager",
@@ -59,6 +63,7 @@ const Blog = () => {
     },
     {
       id: 5,
+      slug: "rsu-tax-planning-timing-stock-vesting-maximum-benefit",
       title: "RSU Tax Planning: Timing Your Stock Vesting for Maximum Benefit",
       excerpt: "Strategic approaches to managing restricted stock unit taxation, including timing strategies and AMT considerations.",
       author: "HRX CPAs Team",
@@ -70,6 +75,7 @@ const Blog = () => {
     },
     {
       id: 6,
+      slug: "small-business-tax-deductions-you-might-be-missing",
       title: "Small Business Tax Deductions You Might Be Missing",
       excerpt: "Comprehensive guide to often-overlooked business deductions that can significantly reduce your tax liability.",
       author: "HRX CPAs Team",
@@ -175,7 +181,7 @@ const Blog = () => {
                       <div>{featuredPost.readTime}</div>
                     </div>
                     <Button asChild size="lg">
-                      <Link to={`/blog/${featuredPost.id}`}>
+                      <Link to={`/blog/${featuredPost.slug}`}>
                         Read Full Article
                         <ArrowRight className="ml-2 h-5 w-5" />
                       </Link>
@@ -223,7 +229,7 @@ const Blog = () => {
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">{post.readTime}</span>
                       <Button asChild variant="outline" size="sm">
-                        <Link to={`/blog/${post.id}`}>
+                        <Link to={`/blog/${post.slug}`}>
                           Read More
                         </Link>
                       </Button>
