@@ -26,7 +26,7 @@ const BlogPost = () => {
     
     // Find the post from the existing blog posts data
     const foundPost = posts.find(p => p.slug === slug);
-    console.log('Found post content length:', foundPost?.content?.length);
+    
     
     if (foundPost) {
       setPost(foundPost);
