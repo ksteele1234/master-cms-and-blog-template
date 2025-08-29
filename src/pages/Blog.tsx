@@ -11,10 +11,6 @@ const Blog = () => {
   const { posts, loading } = useBlogPosts();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
-  console.log('Blog component - posts:', posts);
-  console.log('Blog component - loading:', loading);
-  console.log('Blog component - posts length:', posts.length);
-
   const categories = ["All", "Tax Planning", "Business Growth", "Estate Planning", "Tax Law Updates", "Small Business"];
 
   const filteredPosts = selectedCategory === "All" 
