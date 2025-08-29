@@ -10,8 +10,12 @@ import { Calendar, User, ArrowRight, Clock, Filter, BookOpen, TrendingUp, Shield
 const Blog = () => {
   const { posts, loading } = useBlogPosts();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  
+  console.log('Blog - Total posts:', posts.length);
+  console.log('Blog - Posts data:', posts.map(p => ({ title: p.title, featured: p.featured, category: p.category })));
+  console.log('Blog - Selected category:', selectedCategory);
 
-  const categories = ["All", "Tax Planning", "Business Growth", "Estate Planning", "Tax Law Updates", "Small Business"];
+  const categories = ["All", "Tax Planning", "Tax Credits", "Estate Planning", "Tax Law Updates", "Executive Compensation", "Small Business"];
 
   const filteredPosts = selectedCategory === "All" 
     ? posts 
