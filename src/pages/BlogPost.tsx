@@ -21,7 +21,7 @@ const BlogPost = () => {
       if (!slug) return;
       
       try {
-        // Import the specific markdown file
+        // Import the specific markdown file using the full slug as filename
         const content = await import(`/content/blog/${slug}.md?raw`);
         const { data, content: markdown } = matter(content.default);
         
