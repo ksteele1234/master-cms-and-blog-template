@@ -55,8 +55,8 @@ const Blog = () => {
         {featuredPosts.length > 0 && (
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Featured Articles</h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              {featuredPosts.slice(0, 2).map((post) => (
+            <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+              {featuredPosts.map((post) => (
                 <Card key={post.slug} className="overflow-hidden hover:shadow-lg transition-shadow">
                   <img 
                     src={post.featuredImage} 
