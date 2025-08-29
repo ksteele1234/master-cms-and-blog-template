@@ -4,10 +4,45 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Content Manager</title>
+  <link rel="stylesheet" href="custom.css" />
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
   <!-- Include the script that builds the page and powers Decap CMS -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  
+  <script>
+    // Add status indicators to collection view
+    CMS.registerPreviewStyle('custom.css');
+    
+    // Custom collection view component
+    CMS.registerWidget('status-indicator', {
+      controlComponent: function(props) {
+        const status = props.value || 'draft';
+        const statusColors = {
+          draft: { bg: '#fce7f3', color: '#be185d', border: '#f9a8d4' },
+          in_review: { bg: '#fef3c7', color: '#d97706', border: '#fcd34d' },
+          ready: { bg: '#d1fae5', color: '#059669', border: '#6ee7b7' },
+          published: { bg: '#dbeafe', color: '#2563eb', border: '#93c5fd' }
+        };
+        
+        const style = statusColors[status] || statusColors.draft;
+        
+        return React.createElement('div', {
+          style: {
+            display: 'inline-block',
+            padding: '4px 12px',
+            borderRadius: '6px',
+            fontSize: '12px',
+            fontWeight: '500',
+            backgroundColor: style.bg,
+            color: style.color,
+            border: `1px solid ${style.border}`,
+            textTransform: 'capitalize'
+          }
+        }, status.replace('_', ' '));
+      }
+    });
+  </script>
 </body>
 </html>
