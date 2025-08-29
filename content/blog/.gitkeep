@@ -1,2 +1,9 @@
-# This file ensures the content/blog directory exists in git
-# Blog posts will be stored in this directory
+# Blog Posts Directory
+
+This directory contains all blog post content files managed by Decap CMS.
+
+Each blog post will be stored as a markdown file with frontmatter containing:
+- Title, date, author, category
+- Featured image and SEO metadata
+- Tags and reading time
+- Post content in markdown format
