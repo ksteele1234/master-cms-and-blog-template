@@ -14,7 +14,7 @@ import Footer from '../components/Footer';
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { posts } = useBlogPosts();
+  const { posts, loading: postsLoading } = useBlogPosts();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -26,9 +26,13 @@ const BlogPost = () => {
       return;
     }
     
+    // Wait for posts to load
+    if (postsLoading) {
+      return;
+    }
+    
     // Find the post from the existing blog posts data
     const foundPost = posts.find(p => p.slug === slug);
-    
     
     if (foundPost) {
       setPost(foundPost);
@@ -37,7 +41,7 @@ const BlogPost = () => {
     }
     
     setLoading(false);
-  }, [slug, posts]);
+  }, [slug, posts, postsLoading]);
 
   if (loading) {
     return <div className="container mx-auto px-4 py-8">Loading...</div>;
