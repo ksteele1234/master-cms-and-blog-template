@@ -10,10 +10,6 @@ import { Calendar, User, ArrowRight, Clock, Filter, BookOpen, TrendingUp, Shield
 const Blog = () => {
   const { posts, loading } = useBlogPosts();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  
-  console.log('Blog - Total posts:', posts.length);
-  console.log('Blog - Posts data:', posts.map(p => ({ title: p.title, featured: p.featured, category: p.category })));
-  console.log('Blog - Selected category:', selectedCategory);
 
   const categories = ["All", "Tax Planning", "Tax Credits", "Estate Planning", "Tax Law Updates", "Executive Compensation", "Small Business"];
 
@@ -23,6 +19,13 @@ const Blog = () => {
 
   const featuredPosts = posts.filter(post => post.featured);
   const regularPosts = filteredPosts.filter(post => !post.featured);
+  
+  console.log('Blog - Total posts:', posts.length);
+  console.log('Blog - Posts data:', posts.map(p => ({ title: p.title, featured: p.featured, category: p.category })));
+  console.log('Blog - Selected category:', selectedCategory);
+  console.log('Blog - Featured posts:', featuredPosts.length);
+  console.log('Blog - Regular posts:', regularPosts.length);
+  console.log('Blog - Filtered posts:', filteredPosts.length);
 
   if (loading) {
     return <div className="container mx-auto px-4 py-8">Loading...</div>;
