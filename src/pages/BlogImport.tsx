@@ -188,7 +188,7 @@ ${post.content}
                 <li><strong>category</strong> - Post category</li>
                 <li><strong>excerpt</strong> - Brief description</li>
                 <li><strong>featuredImage</strong> - Image path (e.g., /images/blog/image.jpg)</li>
-                <li><strong>imageAlt</strong> - Image alt text</li>
+                <li><strong>imageAlt</strong> - Image alt text for accessibility</li>
                 <li><strong>content</strong> - Full blog post content (markdown supported)</li>
               </ul>
             </div>
@@ -201,6 +201,27 @@ ${post.content}
                 <li><strong>readingTime</strong> - Reading time estimate</li>
                 <li><strong>featured</strong> - true/false for featured posts</li>
               </ul>
+            </div>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h3 className="font-semibold mb-2 text-blue-800 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4" />
+                Image Storage Instructions
+              </h3>
+              <div className="text-sm text-blue-700 space-y-2">
+                <p><strong>Before importing:</strong></p>
+                <ol className="list-decimal pl-4 space-y-1">
+                  <li>Upload all your blog images to the <code className="bg-blue-100 px-1 rounded">public/images/blog/</code> directory</li>
+                  <li>Use descriptive filenames (e.g., <code className="bg-blue-100 px-1 rounded">tax-planning-2025.jpg</code>)</li>
+                  <li>Recommended image sizes: 1200x600px for featured images</li>
+                  <li>Supported formats: JPG, PNG, WebP</li>
+                </ol>
+                <p><strong>In your CSV:</strong></p>
+                <ul className="list-disc pl-4 space-y-1">
+                  <li>Use the path format: <code className="bg-blue-100 px-1 rounded">/images/blog/your-image.jpg</code></li>
+                  <li>Always include descriptive alt text for accessibility</li>
+                  <li>Ensure image names match exactly (case-sensitive)</li>
+                </ul>
+              </div>
             </div>
             <Button onClick={downloadSampleCSV} variant="outline" size="sm">
               <Download className="w-4 h-4 mr-2" />
@@ -306,10 +327,14 @@ ${post.content}
               <div className="text-sm text-gray-600">
                 <p><strong>Next steps:</strong></p>
                 <ol className="list-decimal pl-4 mt-2 space-y-1">
-                  <li>Upload the generated markdown files to your content/blog/ directory</li>
-                  <li>Ensure all referenced images are uploaded to public/images/blog/</li>
-                  <li>The blog posts will automatically appear on your site</li>
+                  <li><strong>Upload Images:</strong> First, upload all referenced images to the <code className="bg-gray-100 px-1 rounded">public/images/blog/</code> directory</li>
+                  <li><strong>Upload Markdown Files:</strong> Upload the generated markdown files to your <code className="bg-gray-100 px-1 rounded">content/blog/</code> directory</li>
+                  <li><strong>Verify:</strong> Check that image paths in your CSV match the uploaded image filenames exactly</li>
+                  <li><strong>Publish:</strong> The blog posts will automatically appear on your site once both files and images are uploaded</li>
                 </ol>
+                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                  <p className="text-yellow-800 text-xs"><strong>Important:</strong> Blog posts will show broken images if the image files are not uploaded to the correct directory before the markdown files are processed.</p>
+                </div>
               </div>
             </CardContent>
           </Card>
