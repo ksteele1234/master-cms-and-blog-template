@@ -4,42 +4,37 @@ import { Helmet } from 'react-helmet-async';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import matter from 'gray-matter';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, User, Clock, ArrowLeft, Share2, BookOpen } from "lucide-react";
+import { useBlogPosts } from '../hooks/useBlogPosts';
 import type { BlogPost } from '../hooks/useBlogPosts';
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { posts } = useBlogPosts();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    const loadPost = async () => {
-      if (!slug) return;
-      
-      try {
-        // Import the specific markdown file using the full slug as filename
-        const content = await import(`/content/blog/${slug}.md?raw`);
-        const { data, content: markdown } = matter(content.default);
-        
-        setPost({
-          slug,
-          ...data,
-          content: markdown
-        } as BlogPost);
-      } catch (error) {
-        console.error('Post not found:', error);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPost();
-  }, [slug]);
+    if (!slug) {
+      setError(true);
+      setLoading(false);
+      return;
+    }
+    
+    // Find the post from the existing blog posts data
+    const foundPost = posts.find(p => p.slug === slug);
+    
+    if (foundPost) {
+      setPost(foundPost);
+    } else {
+      setError(true);
+    }
+    
+    setLoading(false);
+  }, [slug, posts]);
 
   if (loading) {
     return <div className="container mx-auto px-4 py-8">Loading...</div>;
