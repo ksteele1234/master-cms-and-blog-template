@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, User, ArrowRight, Clock, Filter, BookOpen, TrendingUp, Shield, Calculator } from "lucide-react";
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 const Blog = () => {
   const { posts, loading } = useBlogPosts();
@@ -34,6 +36,8 @@ const Blog = () => {
         <link rel="canonical" href="https://yoursite.com/blog" />
       </Helmet>
 
+      <Header />
+      
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -154,6 +158,8 @@ const Blog = () => {
           </div>
         )}
       </div>
+      
+      <Footer />
     </>
   );
 };

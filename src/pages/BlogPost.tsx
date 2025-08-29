@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Calendar, User, Clock, ArrowLeft, Share2, BookOpen } from "lucide-react";
 import { useBlogPosts } from '../hooks/useBlogPosts';
 import type { BlogPost } from '../hooks/useBlogPosts';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -107,6 +109,8 @@ const BlogPost = () => {
         </script>
       </Helmet>
 
+      <Header />
+      
       <article className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Back to Blog */}
         <div className="mb-6">
@@ -237,6 +241,8 @@ const BlogPost = () => {
           </div>
         </div>
       </article>
+      
+      <Footer />
     </>
   );
 };
