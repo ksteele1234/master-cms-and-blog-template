@@ -20,33 +20,6 @@ const Blog = () => {
   const featuredPosts = posts.filter(post => post.featured);
   const regularPosts = filteredPosts.filter(post => !post.featured);
   
-  console.log('Blog - Total posts:', posts.length);
-  console.log('Blog - Posts data:', posts.map(p => ({ title: p.title, featured: p.featured, category: p.category })));
-  console.log('Blog - Selected category:', selectedCategory);
-  console.log('Blog - Featured posts:', featuredPosts.length);
-  console.log('Blog - Regular posts:', regularPosts.length);
-  console.log('Blog - Filtered posts:', filteredPosts.length);
-  
-  // Detailed post analysis
-  console.log('=== DETAILED POST ANALYSIS ===');
-  posts.forEach((post, index) => {
-    console.log(`Post ${index + 1}: "${post.title}" - Featured: ${post.featured} - Category: ${post.category}`);
-  });
-  
-  console.log('=== FEATURED POSTS (should show all featured) ===');
-  featuredPosts.forEach((post, index) => {
-    console.log(`Featured ${index + 1}: "${post.title}"`);
-  });
-  
-  console.log('=== REGULAR POSTS (filtered, non-featured) ===');
-  regularPosts.forEach((post, index) => {
-    console.log(`Regular ${index + 1}: "${post.title}"`);
-  });
-  
-  console.log('=== FILTERED POSTS (by category) ===');
-  filteredPosts.forEach((post, index) => {
-    console.log(`Filtered ${index + 1}: "${post.title}" - Featured: ${post.featured}`);
-  });
 
   if (loading) {
     return <div className="container mx-auto px-4 py-8">Loading...</div>;
