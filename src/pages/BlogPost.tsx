@@ -18,6 +18,9 @@ const BlogPost = () => {
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    console.log('BlogPost useEffect - slug:', slug);
+    console.log('BlogPost useEffect - posts length:', posts.length);
+    
     if (!slug) {
       setError(true);
       setLoading(false);
@@ -26,6 +29,7 @@ const BlogPost = () => {
     
     // Find the post from the existing blog posts data
     const foundPost = posts.find(p => p.slug === slug);
+    console.log('BlogPost useEffect - foundPost:', foundPost ? 'Found' : 'Not found');
     
     if (foundPost) {
       setPost(foundPost);
