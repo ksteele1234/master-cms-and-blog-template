@@ -24,6 +24,7 @@ interface BlogPostData {
   tags?: string;
   readingTime?: string;
   featured?: string;
+  status?: string;
   content: string;
 }
 
@@ -70,6 +71,7 @@ const BlogImport = () => {
     
     return `---
 title: "${post.title}"
+status: "${post.status || 'draft'}"
 date: "${post.date}"
 author: "${post.author || 'HRX CPAs Team'}"
 category: "${post.category}"
@@ -136,6 +138,7 @@ ${post.content}
         tags: "tax planning, business, finance",
         readingTime: "5 min read",
         featured: "false",
+        status: "draft",
         content: "# Sample Blog Post\n\nThis is the main content of your blog post. You can use markdown formatting here.\n\n## Subheading\n\nMore content goes here..."
       }
     ];
@@ -200,6 +203,7 @@ ${post.content}
                 <li><strong>tags</strong> - Comma-separated tags</li>
                 <li><strong>readingTime</strong> - Reading time estimate</li>
                 <li><strong>featured</strong> - true/false for featured posts</li>
+                <li><strong>status</strong> - Publication status (draft, in_review, ready, published)</li>
               </ul>
             </div>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -330,7 +334,7 @@ ${post.content}
                   <li><strong>Upload Images:</strong> First, upload all referenced images to the <code className="bg-gray-100 px-1 rounded">public/images/blog/</code> directory</li>
                   <li><strong>Upload Markdown Files:</strong> Upload the generated markdown files to your <code className="bg-gray-100 px-1 rounded">content/blog/</code> directory</li>
                   <li><strong>Verify:</strong> Check that image paths in your CSV match the uploaded image filenames exactly</li>
-                  <li><strong>Publish:</strong> The blog posts will automatically appear on your site once both files and images are uploaded</li>
+                  <li><strong>Review & Publish:</strong> Go to <a href="/admin/#/collections/blog" className="text-blue-600 hover:underline">/admin/#/collections/blog</a> to review, edit, and publish your imported posts</li>
                 </ol>
                 <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
                   <p className="text-yellow-800 text-xs"><strong>Important:</strong> Blog posts will show broken images if the image files are not uploaded to the correct directory before the markdown files are processed.</p>
