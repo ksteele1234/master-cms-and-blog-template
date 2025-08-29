@@ -18,9 +18,6 @@ const BlogPost = () => {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    console.log('BlogPost useEffect - slug:', slug);
-    console.log('BlogPost useEffect - posts length:', posts.length);
-    
     if (!slug) {
       setError(true);
       setLoading(false);
@@ -29,7 +26,6 @@ const BlogPost = () => {
     
     // Find the post from the existing blog posts data
     const foundPost = posts.find(p => p.slug === slug);
-    console.log('BlogPost useEffect - foundPost:', foundPost ? 'Found' : 'Not found');
     
     if (foundPost) {
       setPost(foundPost);
@@ -159,41 +155,47 @@ const BlogPost = () => {
 
         {/* Article Content */}
         <div className="prose prose-lg max-w-none">
-          <ReactMarkdown 
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeRaw]}
-            components={{
-              h1: ({children}) => <h1 className="text-3xl font-bold mt-8 mb-4">{children}</h1>,
-              h2: ({children}) => <h2 className="text-2xl font-bold mt-6 mb-3">{children}</h2>,
-              h3: ({children}) => <h3 className="text-xl font-semibold mt-4 mb-2">{children}</h3>,
-              p: ({children}) => <p className="mb-4 leading-relaxed">{children}</p>,
-              ul: ({children}) => <ul className="list-disc pl-6 mb-4">{children}</ul>,
-              ol: ({children}) => <ol className="list-decimal pl-6 mb-4">{children}</ol>,
-              li: ({children}) => <li className="mb-1">{children}</li>,
-              blockquote: ({children}) => (
-                <blockquote className="border-l-4 border-blue-500 pl-4 italic my-4 bg-gray-50 p-4 rounded">
-                  {children}
-                </blockquote>
-              ),
-              table: ({children}) => (
-                <div className="overflow-x-auto my-6">
-                  <table className="min-w-full border-collapse border border-gray-300">
+          {post.content ? (
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw]}
+              components={{
+                h1: ({children}) => <h1 className="text-3xl font-bold mt-8 mb-4">{children}</h1>,
+                h2: ({children}) => <h2 className="text-2xl font-bold mt-6 mb-3">{children}</h2>,
+                h3: ({children}) => <h3 className="text-xl font-semibold mt-4 mb-2">{children}</h3>,
+                p: ({children}) => <p className="mb-4 leading-relaxed">{children}</p>,
+                ul: ({children}) => <ul className="list-disc pl-6 mb-4">{children}</ul>,
+                ol: ({children}) => <ol className="list-decimal pl-6 mb-4">{children}</ol>,
+                li: ({children}) => <li className="mb-1">{children}</li>,
+                blockquote: ({children}) => (
+                  <blockquote className="border-l-4 border-blue-500 pl-4 italic my-4 bg-gray-50 p-4 rounded">
                     {children}
-                  </table>
-                </div>
-              ),
-              th: ({children}) => (
-                <th className="border border-gray-300 bg-gray-100 px-4 py-2 text-left font-semibold">
-                  {children}
-                </th>
-              ),
-              td: ({children}) => (
-                <td className="border border-gray-300 px-4 py-2">{children}</td>
-              ),
-            }}
-          >
-            {post.content}
-          </ReactMarkdown>
+                  </blockquote>
+                ),
+                table: ({children}) => (
+                  <div className="overflow-x-auto my-6">
+                    <table className="min-w-full border-collapse border border-gray-300">
+                      {children}
+                    </table>
+                  </div>
+                ),
+                th: ({children}) => (
+                  <th className="border border-gray-300 bg-gray-100 px-4 py-2 text-left font-semibold">
+                    {children}
+                  </th>
+                ),
+                td: ({children}) => (
+                  <td className="border border-gray-300 px-4 py-2">{children}</td>
+                ),
+              }}
+            >
+              {post.content}
+            </ReactMarkdown>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500">Content is loading...</p>
+            </div>
+          )}
         </div>
 
         {/* Tags */}
