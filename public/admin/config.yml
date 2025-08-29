@@ -1,0 +1,55 @@
+backend:
+  name: git-gateway
+  branch: main
+
+# Enable editorial workflow for draft/review/publish
+publish_mode: editorial_workflow
+
+# Media storage
+media_folder: "public/images/blog"
+public_folder: "/images/blog"
+
+# Collections
+collections:
+  - name: "blog"
+    label: "Blog Posts"
+    folder: "content/blog"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    preview_path: "blog/{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string", hint: "This will be the main headline of your blog post"}
+      - {label: "Publish Date", name: "date", widget: "datetime", hint: "You can schedule posts for future publication"}
+      - {label: "Author", name: "author", widget: "string", default: "HRX CPAs Team"}
+      - {label: "Category", name: "category", widget: "select", 
+         options: ["Tax Planning", "Business Growth", "Estate Planning", "Tax Law Updates", "Small Business"],
+         hint: "Choose the most relevant category"}
+      - {label: "Featured Image", name: "featuredImage", widget: "image", 
+         hint: "Upload a high-quality image (recommended: 1200x630px for best SEO)"}
+      - {label: "Image Alt Text", name: "imageAlt", widget: "string", 
+         hint: "Describe the image for accessibility and SEO"}
+      - {label: "Excerpt", name: "excerpt", widget: "text", 
+         hint: "A brief summary (150-160 characters) that appears in search results"}
+      - {label: "SEO Title", name: "seoTitle", widget: "string", required: false,
+         hint: "Optional: Custom title for search engines (50-60 characters)"}
+      - {label: "Meta Description", name: "metaDescription", widget: "text", required: false,
+         hint: "Optional: Custom description for search engines (150-160 characters)"}
+      - {label: "Tags", name: "tags", widget: "list", required: false,
+         hint: "Add relevant keywords (comma-separated)"}
+      - {label: "Reading Time", name: "readingTime", widget: "string", default: "5 min read"}
+      - {label: "Featured Post", name: "featured", widget: "boolean", default: false,
+         hint: "Check this to highlight the post on your homepage"}
+      - {label: "Body", name: "body", widget: "markdown",
+         hint: "Write your blog post content here. Use the toolbar for formatting."}
+
+# Site settings
+  - name: "settings"
+    label: "Site Settings"
+    files:
+      - label: "Blog Settings"
+        name: "blog"
+        file: "content/settings/blog.yml"
+        fields:
+          - {label: "Blog Title", name: "title", widget: "string"}
+          - {label: "Blog Description", name: "description", widget: "text"}
+          - {label: "Posts Per Page", name: "postsPerPage", widget: "number", default: 6}
