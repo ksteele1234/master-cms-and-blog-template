@@ -55,8 +55,11 @@ const Blog = () => {
 
   // Category filter
   if (selectedCategory !== "All") {
+    console.log('Filtering by category:', selectedCategory);
+    console.log('Available post categories:', filteredPosts.map(p => ({ title: p.title, category: p.category })));
     filteredPosts = filteredPosts.filter(post => post.category === selectedCategory);
     console.log('After category filter:', filteredPosts.length);
+    console.log('Posts matching category:', filteredPosts.map(p => ({ title: p.title, category: p.category })));
   }
 
 
