@@ -39,6 +39,7 @@ collections:
     preview_path: "blog/{{slug}}"
     summary: "{{title}} - {{status}} - {{date | date('MMM DD, YYYY')}}"
     sortable_fields: ["date", "title", "status", "featured"]
+    description: "Manage individual blog posts or use [Bulk CSV Import](/admin/blog-import) for multiple posts"
     view_filters:
       - label: "Draft"
         field: status
