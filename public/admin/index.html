@@ -23,6 +23,38 @@
     .bulk-import-notice a:hover {
       text-decoration: underline;
     }
+    
+    /* Custom status badge styles for CMS */
+    .cms-status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 8px;
+    }
+    .cms-status-draft {
+      background-color: #fce4ec;
+      color: #c2185b;
+      border: 1px solid #f8bbd9;
+    }
+    .cms-status-in_review {
+      background-color: #fff3e0;
+      color: #f57700;
+      border: 1px solid #ffcc02;
+    }
+    .cms-status-ready {
+      background-color: #e8f5e8;
+      color: #2e7d32;
+      border: 1px solid #81c784;
+    }
+    .cms-status-published {
+      background-color: #e3f2fd;
+      color: #1976d2;
+      border: 1px solid #90caf9;
+    }
   </style>
 </head>
 <body>
@@ -105,6 +137,59 @@
     // Also check when hash changes (for SPA navigation)
     window.addEventListener('hashchange', () => {
       setTimeout(injectBulkImportButton, 1000);
+    });
+    
+    // Add status badge enhancement
+    function enhanceStatusDisplay() {
+      const checkForEntries = setInterval(() => {
+        const entries = document.querySelectorAll('[class*="entry-card"], [class*="collection-entry"], [data-testid*="entry"]');
+        
+        if (entries.length > 0) {
+          entries.forEach(entry => {
+            if (entry.dataset.statusEnhanced) return; // Skip if already enhanced
+            
+            const titleElement = entry.querySelector('h2, [class*="title"], [class*="heading"]');
+            if (titleElement) {
+              const text = titleElement.textContent || '';
+              
+              // Extract status from the summary text
+              let status = null;
+              if (text.includes(' - draft - ')) status = 'draft';
+              else if (text.includes(' - in_review - ')) status = 'in_review';
+              else if (text.includes(' - ready - ')) status = 'ready';
+              else if (text.includes(' - published - ')) status = 'published';
+              
+              if (status && !titleElement.querySelector('.cms-status-badge')) {
+                const badge = document.createElement('span');
+                badge.className = `cms-status-badge cms-status-${status}`;
+                
+                let statusText = status;
+                if (status === 'in_review') statusText = 'IN REVIEW';
+                else statusText = status.toUpperCase();
+                
+                badge.textContent = statusText;
+                titleElement.appendChild(badge);
+                entry.dataset.statusEnhanced = 'true';
+              }
+            }
+          });
+        }
+      }, 1000);
+      
+      // Clear interval after 30 seconds
+      setTimeout(() => clearInterval(checkForEntries), 30000);
+    }
+    
+    // Start status enhancement
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', enhanceStatusDisplay);
+    } else {
+      enhanceStatusDisplay();
+    }
+    
+    // Also enhance on hash changes
+    window.addEventListener('hashchange', () => {
+      setTimeout(enhanceStatusDisplay, 1000);
     });
   </script>
 
