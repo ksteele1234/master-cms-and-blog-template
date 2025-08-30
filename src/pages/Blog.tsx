@@ -39,13 +39,19 @@ const Blog = () => {
     { value: "regular", label: "Regular Only" }
   ];
 
-  // Apply all filters
-  let filteredPosts = posts;
+  // Apply all filters - START WITH STATUS FILTER for public blog
+  let filteredPosts = posts.filter(post => {
+    // Only show ready or published posts on public blog
+    const status = post.status?.toLowerCase() || 'published';
+    return status === 'ready' || status === 'published';
+  });
 
   console.log('=== FILTERING DEBUG ===');
   console.log('Total posts:', posts.length);
+  console.log('After status filter (ready/published only):', filteredPosts.length);
   console.log('Selected filters:', { selectedCategory, featuredFilter });
   console.log('All post statuses:', posts.map(p => ({ title: p.title, status: p.status, published: p.published })));
+  console.log('Filtered post statuses:', filteredPosts.map(p => ({ title: p.title, status: p.status })));
 
   // Category filter
   if (selectedCategory !== "All") {
@@ -83,7 +89,10 @@ const Blog = () => {
 
   console.log('Filtered and sorted posts:', sortedPosts.length, 'of', posts.length, 'total posts');
 
-  const featuredPosts = posts.filter(post => post.featured);
+  const featuredPosts = posts.filter(post => {
+    const status = post.status?.toLowerCase() || 'published';
+    return post.featured && (status === 'ready' || status === 'published');
+  });
   const regularPosts = sortedPosts.filter(post => !post.featured);
 
   
