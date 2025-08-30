@@ -31,17 +31,20 @@ const Blog = () => {
   };
 
   const getStatusBadgeStyle = (status: string) => {
+    console.log('Badge styling for status:', status);
     switch (status.toLowerCase()) {
       case 'draft':
         return 'bg-pink-100 text-pink-800 border-pink-200';
       case 'in_review':
       case 'in review':
+      case 'in-review':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'ready':
         return 'bg-green-100 text-green-800 border-green-200';
       case 'published':
         return 'bg-blue-100 text-blue-800 border-blue-200';
       default:
+        console.log('Using default badge style for status:', status);
         return 'bg-blue-100 text-blue-800 border-blue-200';
     }
   };
