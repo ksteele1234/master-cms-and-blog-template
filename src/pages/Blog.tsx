@@ -11,13 +11,20 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 const Blog = () => {
+  console.log('🚀 Blog component rendering...');
   const { posts, loading } = useBlogPosts();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [sortBy, setSortBy] = useState<string>("date-desc");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [featuredFilter, setFeaturedFilter] = useState<string>("all");
 
-  console.log('All loaded posts:', posts.map(p => ({ title: p.title, date: p.date, category: p.category })));
+  console.log('📝 Blog component state:', { 
+    postsCount: posts.length, 
+    loading, 
+    selectedCategory, 
+    statusFilter, 
+    featuredFilter 
+  });
 
   const categories = ["All", "Tax Planning", "Tax Credits", "Estate Planning", "Tax Law Updates", "Executive Compensation", "Small Business"];
   const sortOptions = [
