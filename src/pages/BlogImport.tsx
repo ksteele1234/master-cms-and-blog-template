@@ -299,14 +299,17 @@ ${post.content}
           <CardContent>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="csv-file">CSV File</Label>
-                <Input
-                  id="csv-file"
-                  type="file"
-                  accept=".csv"
-                  onChange={handleFileUpload}
-                  disabled={isProcessing}
-                />
+                <Label htmlFor="csv-file" className="text-base font-medium">CSV File</Label>
+                <div className="mt-2">
+                  <Input
+                    id="csv-file"
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileUpload}
+                    disabled={isProcessing}
+                    className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                  />
+                </div>
               </div>
               {isProcessing && (
                 <Alert>
