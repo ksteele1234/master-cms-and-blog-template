@@ -1,10 +1,21 @@
 backend:
   name: git-gateway
   branch: main
-  
-# Require users to be logged in to access CMS
-site_url: https://your-site-name.netlify.app
-display_url: https://your-site-name.netlify.app
+
+# Local development support
+local_backend: true
+
+# Required for authentication
+media_folder: "public/images/blog"
+public_folder: "/images/blog"
+
+# Site configuration - REPLACE WITH YOUR ACTUAL NETLIFY URL
+site_url: https://your-actual-site.netlify.app
+display_url: https://your-actual-site.netlify.app
+
+# Authentication requirements
+auth_scope: repo
+auth_type: implicit
 
 # Enable editorial workflow for draft/review/publish
 publish_mode: editorial_workflow
