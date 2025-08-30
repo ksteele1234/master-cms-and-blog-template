@@ -136,27 +136,24 @@ ${post.content}
           const slug = generateSlug(post.title, post.date);
           const markdownContent = generateMarkdownContent(post);
           
-          // Use Decap CMS editorial workflow API to create draft entries
-          const entryData = {
-            slug: slug,
-            raw: markdownContent,
-            path: `content/blog/${slug}.md`,
-            partial: false,
-            author: {
-              login: user.user_metadata?.full_name || user.email,
-              name: user.user_metadata?.full_name || user.email,
-              email: user.email
-            }
-          };
-
-          // Create entry through Decap CMS editorial workflow
+          // Create entry through Decap CMS API with proper editorial workflow format
           const response = await fetch('/.netlify/git/github/entries/blog', {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify(entryData)
+            body: JSON.stringify({
+              slug: slug,
+              raw: markdownContent,
+              path: `content/blog/${slug}.md`,
+              partial: false,
+              author: {
+                login: user.user_metadata?.full_name || user.email,
+                name: user.user_metadata?.full_name || user.email,
+                email: user.email
+              }
+            })
           });
 
           if (!response.ok) {
