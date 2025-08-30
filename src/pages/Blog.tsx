@@ -5,7 +5,8 @@ import { useBlogPosts } from '../hooks/useBlogPosts';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, User, ArrowRight, Clock, Filter, BookOpen, TrendingUp, Shield, Calculator } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar, User, ArrowRight, Clock, Filter, BookOpen, TrendingUp, Shield, Calculator, ChevronDown } from "lucide-react";
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
@@ -13,6 +14,8 @@ const Blog = () => {
   const { posts, loading } = useBlogPosts();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [sortBy, setSortBy] = useState<string>("date-desc");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [featuredFilter, setFeaturedFilter] = useState<string>("all");
 
   console.log('All loaded posts:', posts.map(p => ({ title: p.title, date: p.date, category: p.category })));
 
@@ -24,13 +27,46 @@ const Blog = () => {
     { value: "title-desc", label: "Title Z-A" }
   ];
 
-  // Apply category filter
-  const categoryFilteredPosts = selectedCategory === "All" 
-    ? posts 
-    : posts.filter(post => post.category === selectedCategory);
+  const statusOptions = [
+    { value: "all", label: "All Statuses" },
+    { value: "draft", label: "Draft" },
+    { value: "in_review", label: "In Review" },
+    { value: "ready", label: "Ready" },
+    { value: "published", label: "Published" }
+  ];
 
-  // Apply sorting
-  const sortedPosts = [...categoryFilteredPosts].sort((a, b) => {
+  const featuredOptions = [
+    { value: "all", label: "All Posts" },
+    { value: "featured", label: "Featured Only" },
+    { value: "regular", label: "Regular Only" }
+  ];
+
+  // Apply all filters
+  let filteredPosts = posts;
+  // Category filter
+  if (selectedCategory !== "All") {
+    filteredPosts = filteredPosts.filter(post => post.category === selectedCategory);
+  }
+
+  // Status filter  
+  if (statusFilter !== "all") {
+    filteredPosts = filteredPosts.filter(post => {
+      const postStatus = (post.status || 'published').toLowerCase();
+      return postStatus === statusFilter;
+    });
+  }
+
+  // Featured filter
+  if (featuredFilter !== "all") {
+    if (featuredFilter === "featured") {
+      filteredPosts = filteredPosts.filter(post => post.featured);
+    } else if (featuredFilter === "regular") {
+      filteredPosts = filteredPosts.filter(post => !post.featured);
+    }
+  }
+
+  // Apply sorting to filtered posts
+  const sortedPosts = [...filteredPosts].sort((a, b) => {
     switch (sortBy) {
       case "date-desc":
         return new Date(b.date).getTime() - new Date(a.date).getTime();
@@ -44,6 +80,8 @@ const Blog = () => {
         return new Date(b.date).getTime() - new Date(a.date).getTime();
     }
   });
+
+  console.log('Filtered and sorted posts:', sortedPosts.length, 'of', posts.length, 'total posts');
 
   const featuredPosts = posts.filter(post => post.featured);
   const regularPosts = sortedPosts.filter(post => !post.featured);
@@ -151,47 +189,89 @@ const Blog = () => {
         )}
 
         {/* Filter and Sort Controls */}
-        <div className="mb-8 space-y-4">
-          {/* Category Filter */}
-          <div>
-            <div className="flex items-center mb-4">
+        <div className="mb-8 space-y-6">
+          {/* Filter Controls Row */}
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center">
               <Filter className="w-5 h-5 mr-2" />
-              <span className="font-medium">Filter by Category:</span>
+              <span className="font-medium">Filters:</span>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  variant={selectedCategory === category ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(category)}
-                  className="mb-2"
-                >
-                  {category}
-                </Button>
-              ))}
+            
+            {/* Category Filter */}
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">Category</label>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-48 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 z-50">
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category} className="hover:bg-gray-100 dark:hover:bg-gray-700">
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Status Filter */}
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">Status</label>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-40 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
+                  <SelectValue placeholder="All statuses" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 z-50">
+                  {statusOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value} className="hover:bg-gray-100 dark:hover:bg-gray-700">
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Featured Filter */}
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">Featured</label>
+              <Select value={featuredFilter} onValueChange={setFeaturedFilter}>
+                <SelectTrigger className="w-36 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
+                  <SelectValue placeholder="All posts" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 z-50">
+                  {featuredOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value} className="hover:bg-gray-100 dark:hover:bg-gray-700">
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Sort Control */}
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">Sort by</label>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-40 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 z-50">
+                  {sortOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value} className="hover:bg-gray-100 dark:hover:bg-gray-700">
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
-          
-          {/* Sort Controls */}
-          <div>
-            <div className="flex items-center mb-4">
-              <ArrowRight className="w-5 h-5 mr-2" />
-              <span className="font-medium">Sort by:</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {sortOptions.map((option) => (
-                <Button
-                  key={option.value}
-                  variant={sortBy === option.value ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSortBy(option.value)}
-                  className="mb-2"
-                >
-                  {option.label}
-                </Button>
-              ))}
-            </div>
+
+          {/* Results Counter */}
+          <div className="text-sm text-gray-600">
+            Showing {sortedPosts.length} of {posts.length} posts
+            {selectedCategory !== "All" && ` in "${selectedCategory}"`}
+            {statusFilter !== "all" && ` with status "${statusOptions.find(o => o.value === statusFilter)?.label}"`}
+            {featuredFilter !== "all" && ` (${featuredOptions.find(o => o.value === featuredFilter)?.label})`}
           </div>
         </div>
 
