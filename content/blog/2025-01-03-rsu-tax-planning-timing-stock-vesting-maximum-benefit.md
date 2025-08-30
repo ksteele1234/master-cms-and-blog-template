@@ -11,6 +11,7 @@ metaDescription: "Expert RSU tax planning strategies for tech professionals. Lea
 tags: ["RSU planning", "stock compensation", "tax planning", "equity compensation", "tech professionals"]
 readingTime: "9 min read"
 featured: true
+status: published
 ---
 
 # RSU Tax Planning: Timing Your Stock Vesting for Maximum Benefit

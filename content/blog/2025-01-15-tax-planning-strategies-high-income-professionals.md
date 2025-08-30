@@ -11,6 +11,7 @@ metaDescription: "Discover proven tax planning strategies for high-income profes
 tags: ["tax planning", "high income", "tax strategies", "2025 tax law", "executive compensation"]
 readingTime: "8 min read"
 featured: true
+status: published
 ---
 
 # 2025 Tax Planning Strategies for High-Income Professionals

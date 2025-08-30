@@ -11,6 +11,7 @@ metaDescription: "Discover how tech companies can maximize R&D tax credits. Expe
 tags: ["R&D tax credits", "tech companies", "software development", "tax savings", "research credits"]
 readingTime: "7 min read"
 featured: true
+status: published
 ---
 
 # R&D Tax Credits: Hidden Opportunities for Tech Companies

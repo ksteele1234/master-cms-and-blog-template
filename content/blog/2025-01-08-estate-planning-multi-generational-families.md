@@ -19,6 +19,7 @@ tags:
   - legacy planning
 readingTime: 9 min read
 featured: true
+status: published
 ---
 
 # Estate Planning for Multi-Generational Families
