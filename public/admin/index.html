@@ -139,25 +139,42 @@
       setTimeout(injectBulkImportButton, 1000);
     });
     
-    // Add status badge enhancement
+    // Add status badge enhancement with debugging
     function enhanceStatusDisplay() {
+      console.log('🔍 Starting status enhancement check...');
+      
       const checkForEntries = setInterval(() => {
-        const entries = document.querySelectorAll('[class*="entry-card"], [class*="collection-entry"], [data-testid*="entry"]');
+        const entries = document.querySelectorAll('[class*="entry-card"], [class*="collection-entry"], [data-testid*="entry"], .css-1jp8eo6, .css-1dbjc4n');
+        console.log('📋 Found entries:', entries.length);
         
         if (entries.length > 0) {
-          entries.forEach(entry => {
+          entries.forEach((entry, index) => {
             if (entry.dataset.statusEnhanced) return; // Skip if already enhanced
             
-            const titleElement = entry.querySelector('h2, [class*="title"], [class*="heading"]');
+            // Debug the entry structure
+            console.log(`📝 Entry ${index}:`, {
+              innerHTML: entry.innerHTML.substring(0, 200),
+              textContent: entry.textContent?.substring(0, 200),
+              classes: entry.className
+            });
+            
+            const titleElement = entry.querySelector('h2, [class*="title"], [class*="heading"], .css-901oao');
             if (titleElement) {
               const text = titleElement.textContent || '';
+              console.log(`📖 Title text: "${text}"`);
               
-              // Extract status from the summary text
+              // Extract status from the summary text - multiple patterns
               let status = null;
               if (text.includes(' - draft - ')) status = 'draft';
               else if (text.includes(' - in_review - ')) status = 'in_review';
               else if (text.includes(' - ready - ')) status = 'ready';
               else if (text.includes(' - published - ')) status = 'published';
+              else if (text.toLowerCase().includes('draft')) status = 'draft';
+              else if (text.toLowerCase().includes('review')) status = 'in_review';
+              else if (text.toLowerCase().includes('ready')) status = 'ready';
+              else if (text.toLowerCase().includes('published')) status = 'published';
+              
+              console.log(`🏷️ Detected status: "${status}" from text: "${text}"`);
               
               if (status && !titleElement.querySelector('.cms-status-badge')) {
                 const badge = document.createElement('span');
@@ -170,14 +187,27 @@
                 badge.textContent = statusText;
                 titleElement.appendChild(badge);
                 entry.dataset.statusEnhanced = 'true';
+                console.log(`✅ Added ${statusText} badge to entry`);
+              } else if (!status) {
+                console.log('❌ No status detected, adding default PUBLISHED badge');
+                const badge = document.createElement('span');
+                badge.className = 'cms-status-badge cms-status-published';
+                badge.textContent = 'PUBLISHED';
+                titleElement.appendChild(badge);
+                entry.dataset.statusEnhanced = 'true';
               }
+            } else {
+              console.log('❌ No title element found in entry');
             }
           });
         }
       }, 1000);
       
       // Clear interval after 30 seconds
-      setTimeout(() => clearInterval(checkForEntries), 30000);
+      setTimeout(() => {
+        clearInterval(checkForEntries);
+        console.log('⏰ Status enhancement timeout reached');
+      }, 30000);
     }
     
     // Start status enhancement
