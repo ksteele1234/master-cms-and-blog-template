@@ -22,19 +22,23 @@ const Blog = () => {
   const featuredPosts = posts.filter(post => post.featured);
   const regularPosts = filteredPosts.filter(post => !post.featured);
 
-  // Function to get status badge style
+  // Function to get display status and badge style
+  const getDisplayStatus = (post: any) => {
+    return post.published ? 'Published' : (post.status || 'Draft');
+  };
+
   const getStatusBadgeStyle = (status: string) => {
     switch (status.toLowerCase()) {
       case 'draft':
-        return 'bg-status-draft text-status-draft-foreground';
+        return 'bg-pink-100 text-pink-800 border-pink-200';
       case 'in review':
-        return 'bg-status-review text-status-review-foreground';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'ready':
-        return 'bg-status-ready text-status-ready-foreground';
+        return 'bg-green-100 text-green-800 border-green-200';
       case 'published':
-        return 'bg-status-published text-status-published-foreground';
+        return 'bg-blue-100 text-blue-800 border-blue-200';
       default:
-        return 'bg-status-published text-status-published-foreground';
+        return 'bg-blue-100 text-blue-800 border-blue-200';
     }
   };
   
@@ -96,9 +100,9 @@ const Blog = () => {
                           {new Date(post.date).toLocaleDateString()}
                         </span>
                         <Badge 
-                          className={`text-xs px-2 py-1 ${getStatusBadgeStyle(post.status)}`}
+                          className={`text-xs px-2 py-1 border ${getStatusBadgeStyle(getDisplayStatus(post))}`}
                         >
-                          {post.status}
+                          {getDisplayStatus(post)}
                         </Badge>
                         <span className="flex items-center">
                           <Clock className="w-4 h-4 mr-1" />
@@ -158,9 +162,9 @@ const Blog = () => {
                       {new Date(post.date).toLocaleDateString()}
                     </span>
                     <Badge 
-                      className={`text-xs px-2 py-1 ${getStatusBadgeStyle(post.status)}`}
+                      className={`text-xs px-2 py-1 border ${getStatusBadgeStyle(getDisplayStatus(post))}`}
                     >
-                      {post.status}
+                      {getDisplayStatus(post)}
                     </Badge>
                   </div>
                   <span className="flex items-center">
