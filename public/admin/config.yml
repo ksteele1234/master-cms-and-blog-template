@@ -9,9 +9,9 @@ local_backend: true
 media_folder: "public/images/blog"
 public_folder: "/images/blog"
 
-# Site configuration - REPLACE WITH YOUR ACTUAL NETLIFY URL
-site_url: https://your-actual-site.netlify.app
-display_url: https://your-actual-site.netlify.app
+# Site configuration
+site_url: https://hrx-cpas.netlify.app
+display_url: https://hrx-cpas.netlify.app
 
 # Authentication requirements
 auth_scope: repo
