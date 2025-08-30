@@ -107,6 +107,24 @@ ${post.content}
     setIsProcessing(true);
 
     try {
+      // Check if user is authenticated with Netlify Identity
+      if (!window.netlifyIdentity || !window.netlifyIdentity.currentUser()) {
+        errors.push('You must be logged in to create blog posts');
+        setResults({ success: 0, errors });
+        setIsProcessing(false);
+        return;
+      }
+
+      const user = window.netlifyIdentity.currentUser();
+      const token = user.token?.access_token;
+      
+      if (!token) {
+        errors.push('Authentication token not available');
+        setResults({ success: 0, errors });
+        setIsProcessing(false);
+        return;
+      }
+
       for (let index = 0; index < csvData.length; index++) {
         const post = csvData[index];
         try {
@@ -118,21 +136,30 @@ ${post.content}
           const slug = generateSlug(post.title, post.date);
           const markdownContent = generateMarkdownContent(post);
           
-          // Create a download link for each post
-          const blob = new Blob([markdownContent], { type: 'text/markdown' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `${slug}.md`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
+          // Use Git Gateway API to create the file
+          const response = await fetch('/.netlify/git/github/contents/content/blog/' + slug + '.md', {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              message: `Add blog post: ${post.title}`,
+              content: btoa(unescape(encodeURIComponent(markdownContent))),
+              branch: 'main'
+            })
+          });
+
+          if (!response.ok) {
+            const errorData = await response.text();
+            errors.push(`Row ${index + 1}: Failed to create file - ${errorData}`);
+            continue;
+          }
 
           successCount++;
           
-          // Small delay between downloads to prevent browser issues
-          await new Promise(resolve => setTimeout(resolve, 100));
+          // Small delay between API calls
+          await new Promise(resolve => setTimeout(resolve, 200));
         } catch (error) {
           errors.push(`Row ${index + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
@@ -337,8 +364,8 @@ ${post.content}
                   className="w-full"
                   disabled={isProcessing}
                 >
-                  <Download className="w-4 h-4 mr-2" />
-                  {isProcessing ? 'Generating Files...' : 'Download Blog Post Files'}
+                  <Upload className="w-4 h-4 mr-2" />
+                  {isProcessing ? 'Creating Posts...' : 'Create Blog Posts in CMS'}
                 </Button>
               </div>
             </CardContent>
@@ -356,7 +383,7 @@ ${post.content}
                 <Alert className="border-green-200 bg-green-50">
                   <CheckCircle className="h-4 w-4 text-green-600" />
                   <AlertDescription className="text-green-800">
-                    Successfully generated {results.success} blog post files for download
+                    Successfully created {results.success} blog posts in the CMS
                   </AlertDescription>
                 </Alert>
               )}
@@ -376,13 +403,12 @@ ${post.content}
                 <div className="text-sm text-gray-600">
                 <p><strong>Next steps:</strong></p>
                 <ol className="list-decimal pl-4 mt-2 space-y-1">
-                  <li><strong>Upload Files:</strong> Upload the downloaded .md files to the <code className="bg-gray-100 px-1 rounded">content/blog/</code> folder in your project</li>
-                  <li><strong>Upload Images:</strong> Make sure all referenced images are uploaded to the <code className="bg-gray-100 px-1 rounded">public/images/blog/</code> directory</li>
                   <li><strong>Review Posts:</strong> Go to <a href="/admin/#/collections/blog" className="text-blue-600 hover:underline">/admin/#/collections/blog</a> to review and edit your posts</li>
+                  <li><strong>Upload Images:</strong> Make sure all referenced images are uploaded to the <code className="bg-gray-100 px-1 rounded">public/images/blog/</code> directory</li>
                   <li><strong>Publish:</strong> Change the status from "draft" to "published" for each post you want to make live</li>
                 </ol>
                 <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
-                  <p className="text-blue-800 text-xs"><strong>Success!</strong> Your blog post files have been generated and downloaded. Upload them to your content folder to complete the import.</p>
+                  <p className="text-blue-800 text-xs"><strong>Success!</strong> Your blog posts have been created and are available in the CMS for review.</p>
                 </div>
               </div>
             </CardContent>
