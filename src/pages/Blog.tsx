@@ -92,10 +92,7 @@ const Blog = () => {
 
   console.log('Filtered and sorted posts:', sortedPosts.length, 'of', posts.length, 'total posts');
 
-  const featuredPosts = posts.filter(post => {
-    const status = post.status?.toLowerCase() || 'published';
-    return post.featured && status === 'published';
-  });
+  const featuredPosts = sortedPosts.filter(post => post.featured);
   const regularPosts = sortedPosts.filter(post => !post.featured);
 
   
