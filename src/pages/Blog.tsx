@@ -24,8 +24,8 @@ const Blog = () => {
 
   // Function to get display status and badge style
   const getDisplayStatus = (post: any) => {
-    // Use the status field first, fallback to published/draft logic
-    return post.status || (post.published ? 'published' : 'draft');
+    // If no status field exists or status is empty/undefined, default to 'PUBLISHED'
+    return post.status || 'PUBLISHED';
   };
 
   const getStatusBadgeStyle = (status: string) => {
@@ -40,7 +40,7 @@ const Blog = () => {
       case 'published':
         return 'bg-blue-100 text-blue-800 border-blue-200';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-blue-100 text-blue-800 border-blue-200';
     }
   };
   
