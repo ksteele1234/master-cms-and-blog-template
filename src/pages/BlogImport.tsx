@@ -11,6 +11,18 @@ import { Download, Upload, FileText, AlertCircle, CheckCircle } from "lucide-rea
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
+// Extend the global window interface for Netlify Identity
+declare global {
+  interface Window {
+    netlifyIdentity?: {
+      on: (event: string, callback: (user?: any) => void) => void;
+      init: () => void;
+      currentUser: () => any;
+      open: () => void;
+    };
+  }
+}
+
 interface BlogPostData {
   title: string;
   date: string;
@@ -89,38 +101,80 @@ ${post.content}
 `;
   };
 
-  const downloadMarkdownFiles = () => {
+  const createBlogPosts = async () => {
     const errors: string[] = [];
     let successCount = 0;
+    setIsProcessing(true);
 
-    csvData.forEach((post, index) => {
-      try {
-        if (!post.title || !post.date || !post.content) {
-          errors.push(`Row ${index + 1}: Missing required fields (title, date, or content)`);
-          return;
-        }
-
-        const slug = generateSlug(post.title, post.date);
-        const markdownContent = generateMarkdownContent(post);
-        
-        // Create and download the file
-        const blob = new Blob([markdownContent], { type: 'text/markdown' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${slug}.md`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        successCount++;
-      } catch (error) {
-        errors.push(`Row ${index + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    try {
+      // Initialize Netlify CMS if not already done
+      if (typeof window !== 'undefined' && window.netlifyIdentity) {
+        await new Promise((resolve) => {
+          if (window.netlifyIdentity.currentUser()) {
+            resolve(true);
+          } else {
+            window.netlifyIdentity.on('login', resolve);
+            window.netlifyIdentity.open();
+          }
+        });
       }
-    });
+
+      for (let index = 0; index < csvData.length; index++) {
+        const post = csvData[index];
+        try {
+          if (!post.title || !post.date || !post.content) {
+            errors.push(`Row ${index + 1}: Missing required fields (title, date, or content)`);
+            continue;
+          }
+
+          const slug = generateSlug(post.title, post.date);
+          const markdownContent = generateMarkdownContent(post);
+          
+          // Create post via Netlify CMS API
+          const response = await fetch('/.netlify/git/github/contents/content/blog/' + slug + '.md', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `token ${await getGitHubToken()}`,
+            },
+            body: JSON.stringify({
+              message: `Add blog post: ${post.title}`,
+              content: btoa(unescape(encodeURIComponent(markdownContent))),
+              branch: 'main'
+            })
+          });
+
+          if (response.ok) {
+            successCount++;
+          } else {
+            errors.push(`Row ${index + 1}: Failed to create post - ${response.statusText}`);
+          }
+        } catch (error) {
+          errors.push(`Row ${index + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+      }
+    } catch (error) {
+      errors.push(`Authentication error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
 
     setResults({ success: successCount, errors });
+    setIsProcessing(false);
+  };
+
+  const getGitHubToken = async (): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      if (window.netlifyIdentity && window.netlifyIdentity.currentUser()) {
+        const user = window.netlifyIdentity.currentUser();
+        const token = user.token?.access_token;
+        if (token) {
+          resolve(token);
+        } else {
+          reject(new Error('No access token available'));
+        }
+      } else {
+        reject(new Error('User not authenticated'));
+      }
+    });
   };
 
   const downloadSampleCSV = () => {
@@ -291,9 +345,13 @@ ${post.content}
                 )}
               </div>
               <div className="mt-4 pt-4 border-t">
-                <Button onClick={downloadMarkdownFiles} className="w-full">
-                  <Download className="w-4 h-4 mr-2" />
-                  Generate & Download Markdown Files
+                <Button 
+                  onClick={createBlogPosts} 
+                  className="w-full"
+                  disabled={isProcessing}
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  {isProcessing ? 'Creating Posts...' : 'Create Blog Posts in CMS'}
                 </Button>
               </div>
             </CardContent>
@@ -311,7 +369,7 @@ ${post.content}
                 <Alert className="border-green-200 bg-green-50">
                   <CheckCircle className="h-4 w-4 text-green-600" />
                   <AlertDescription className="text-green-800">
-                    Successfully generated {results.success} markdown files
+                    Successfully created {results.success} blog posts in the CMS
                   </AlertDescription>
                 </Alert>
               )}
@@ -331,13 +389,13 @@ ${post.content}
               <div className="text-sm text-gray-600">
                 <p><strong>Next steps:</strong></p>
                 <ol className="list-decimal pl-4 mt-2 space-y-1">
-                  <li><strong>Upload Images:</strong> First, upload all referenced images to the <code className="bg-gray-100 px-1 rounded">public/images/blog/</code> directory</li>
-                  <li><strong>Upload Markdown Files:</strong> Upload the generated markdown files to your <code className="bg-gray-100 px-1 rounded">content/blog/</code> directory</li>
-                  <li><strong>Verify:</strong> Check that image paths in your CSV match the uploaded image filenames exactly</li>
-                  <li><strong>Review & Publish:</strong> Go to <a href="/admin/#/collections/blog" className="text-blue-600 hover:underline">/admin/#/collections/blog</a> to review, edit, and publish your imported posts</li>
+                  <li><strong>Upload Images:</strong> Make sure all referenced images are uploaded to the <code className="bg-gray-100 px-1 rounded">public/images/blog/</code> directory</li>
+                  <li><strong>Review Posts:</strong> Go to <a href="/admin/#/collections/blog" className="text-blue-600 hover:underline">/admin/#/collections/blog</a> to review and edit your imported posts</li>
+                  <li><strong>Publish:</strong> Change the status from "draft" to "published" for each post you want to make live</li>
+                  <li><strong>Verify Images:</strong> Check that all images display correctly on the published posts</li>
                 </ol>
-                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
-                  <p className="text-yellow-800 text-xs"><strong>Important:</strong> Blog posts will show broken images if the image files are not uploaded to the correct directory before the markdown files are processed.</p>
+                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
+                  <p className="text-blue-800 text-xs"><strong>Success!</strong> Your blog posts have been created directly in the CMS and are ready for review and publication.</p>
                 </div>
               </div>
             </CardContent>
