@@ -12,15 +12,41 @@ import Footer from '../components/Footer';
 const Blog = () => {
   const { posts, loading } = useBlogPosts();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [sortBy, setSortBy] = useState<string>("date-desc");
+
+  console.log('All loaded posts:', posts.map(p => ({ title: p.title, date: p.date, category: p.category })));
 
   const categories = ["All", "Tax Planning", "Tax Credits", "Estate Planning", "Tax Law Updates", "Executive Compensation", "Small Business"];
+  const sortOptions = [
+    { value: "date-desc", label: "Newest First" },
+    { value: "date-asc", label: "Oldest First" }, 
+    { value: "title-asc", label: "Title A-Z" },
+    { value: "title-desc", label: "Title Z-A" }
+  ];
 
-  const filteredPosts = selectedCategory === "All" 
+  // Apply category filter
+  const categoryFilteredPosts = selectedCategory === "All" 
     ? posts 
     : posts.filter(post => post.category === selectedCategory);
 
+  // Apply sorting
+  const sortedPosts = [...categoryFilteredPosts].sort((a, b) => {
+    switch (sortBy) {
+      case "date-desc":
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      case "date-asc":
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      case "title-asc":
+        return a.title.localeCompare(b.title);
+      case "title-desc":
+        return b.title.localeCompare(a.title);
+      default:
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+    }
+  });
+
   const featuredPosts = posts.filter(post => post.featured);
-  const regularPosts = filteredPosts.filter(post => !post.featured);
+  const regularPosts = sortedPosts.filter(post => !post.featured);
 
   // Function to get display status and badge style
   const getDisplayStatus = (post: any) => {
@@ -124,24 +150,48 @@ const Blog = () => {
           </section>
         )}
 
-        {/* Category Filter */}
-        <div className="mb-8">
-          <div className="flex items-center mb-4">
-            <Filter className="w-5 h-5 mr-2" />
-            <span className="font-medium">Filter by Category:</span>
+        {/* Filter and Sort Controls */}
+        <div className="mb-8 space-y-4">
+          {/* Category Filter */}
+          <div>
+            <div className="flex items-center mb-4">
+              <Filter className="w-5 h-5 mr-2" />
+              <span className="font-medium">Filter by Category:</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {categories.map((category) => (
+                <Button
+                  key={category}
+                  variant={selectedCategory === category ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedCategory(category)}
+                  className="mb-2"
+                >
+                  {category}
+                </Button>
+              ))}
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory(category)}
-                className="mb-2"
-              >
-                {category}
-              </Button>
-            ))}
+          
+          {/* Sort Controls */}
+          <div>
+            <div className="flex items-center mb-4">
+              <ArrowRight className="w-5 h-5 mr-2" />
+              <span className="font-medium">Sort by:</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {sortOptions.map((option) => (
+                <Button
+                  key={option.value}
+                  variant={sortBy === option.value ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSortBy(option.value)}
+                  className="mb-2"
+                >
+                  {option.label}
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -191,7 +241,7 @@ const Blog = () => {
           ))}
         </div>
 
-        {filteredPosts.length === 0 && (
+        {sortedPosts.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-500">No posts found in this category.</p>
           </div>
