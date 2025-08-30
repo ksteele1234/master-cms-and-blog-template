@@ -43,26 +43,39 @@ const Blog = () => {
 
   // Apply all filters
   let filteredPosts = posts;
+
+  console.log('=== FILTERING DEBUG ===');
+  console.log('Total posts:', posts.length);
+  console.log('Selected filters:', { selectedCategory, statusFilter, featuredFilter });
+  console.log('All post statuses:', posts.map(p => ({ title: p.title, status: p.status, published: p.published })));
+
   // Category filter
   if (selectedCategory !== "All") {
     filteredPosts = filteredPosts.filter(post => post.category === selectedCategory);
+    console.log('After category filter:', filteredPosts.length);
   }
 
   // Status filter  
   if (statusFilter !== "all") {
+    console.log('Applying status filter for:', statusFilter);
     filteredPosts = filteredPosts.filter(post => {
       const postStatus = (post.status || 'published').toLowerCase();
-      return postStatus === statusFilter;
+      const matches = postStatus === statusFilter;
+      console.log(`Post "${post.title}": status="${post.status}" -> normalized="${postStatus}" -> matches "${statusFilter}": ${matches}`);
+      return matches;
     });
+    console.log('After status filter:', filteredPosts.length);
   }
 
   // Featured filter
   if (featuredFilter !== "all") {
+    console.log('Applying featured filter for:', featuredFilter);
     if (featuredFilter === "featured") {
       filteredPosts = filteredPosts.filter(post => post.featured);
     } else if (featuredFilter === "regular") {
       filteredPosts = filteredPosts.filter(post => !post.featured);
     }
+    console.log('After featured filter:', filteredPosts.length);
   }
 
   // Apply sorting to filtered posts
