@@ -1,6 +1,10 @@
 backend:
   name: git-gateway
   branch: main
+  
+# Require users to be logged in to access CMS
+site_url: https://your-site-name.netlify.app
+display_url: https://your-site-name.netlify.app
 
 # Enable editorial workflow for draft/review/publish
 publish_mode: editorial_workflow
