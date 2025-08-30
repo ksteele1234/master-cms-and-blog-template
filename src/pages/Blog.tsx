@@ -123,49 +123,6 @@ const Blog = () => {
           </p>
         </div>
 
-        {/* Featured Posts */}
-        {featuredPosts.length > 0 && (
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Featured Articles</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
-              {featuredPosts.map((post) => (
-                <Card key={post.slug} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <img 
-                    src={post.featuredImage} 
-                    alt={post.imageAlt}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-6">
-                    <Badge variant="secondary" className="mb-3">{post.category}</Badge>
-                    <h3 className="text-xl font-semibold mb-3">
-                      <Link to={`/blog/${post.slug}`} className="hover:text-blue-600 transition-colors">
-                        {post.title}
-                      </Link>
-                    </h3>
-                    <p className="text-gray-600 mb-4">{post.excerpt}</p>
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      <div className="flex items-center space-x-4">
-                        <span className="flex items-center">
-                          <User className="w-4 h-4 mr-1" />
-                          {post.author}
-                        </span>
-                        <span className="flex items-center">
-                          <Calendar className="w-4 h-4 mr-1" />
-                          {new Date(post.date).toLocaleDateString()}
-                        </span>
-                        <span className="flex items-center">
-                          <Clock className="w-4 h-4 mr-1" />
-                          {post.readingTime}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </section>
-        )}
-
         {/* Filter and Sort Controls */}
         <div className="mb-8 space-y-6">
           {/* Filter Controls Row */}
@@ -236,6 +193,49 @@ const Blog = () => {
             {featuredFilter !== "all" && ` (${featuredOptions.find(o => o.value === featuredFilter)?.label})`}
           </div>
         </div>
+
+        {/* Featured Posts */}
+        {featuredPosts.length > 0 && (
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Featured Articles</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+              {featuredPosts.map((post) => (
+                <Card key={post.slug} className="overflow-hidden hover:shadow-lg transition-shadow">
+                  <img 
+                    src={post.featuredImage} 
+                    alt={post.imageAlt}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-6">
+                    <Badge variant="secondary" className="mb-3">{post.category}</Badge>
+                    <h3 className="text-xl font-semibold mb-3">
+                      <Link to={`/blog/${post.slug}`} className="hover:text-blue-600 transition-colors">
+                        {post.title}
+                      </Link>
+                    </h3>
+                    <p className="text-gray-600 mb-4">{post.excerpt}</p>
+                    <div className="flex items-center justify-between text-sm text-gray-500">
+                      <div className="flex items-center space-x-4">
+                        <span className="flex items-center">
+                          <User className="w-4 h-4 mr-1" />
+                          {post.author}
+                        </span>
+                        <span className="flex items-center">
+                          <Calendar className="w-4 h-4 mr-1" />
+                          {new Date(post.date).toLocaleDateString()}
+                        </span>
+                        <span className="flex items-center">
+                          <Clock className="w-4 h-4 mr-1" />
+                          {post.readingTime}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Regular Posts Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
