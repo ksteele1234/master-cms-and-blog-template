@@ -13,17 +13,8 @@ display_url: https://hrx-cpas.netlify.app
 auth_scope: repo
 auth_type: implicit
 
-# Enable editorial workflow for draft/review/publish
+# Enable editorial workflow for draft/review/publish states
 publish_mode: editorial_workflow
-
-# Editorial workflow settings
-editorial_workflow:
-  publish_mode: simple
-  status:
-    draft: "Draft"
-    in_review: "In Review" 
-    ready: "Ready"
-    published: "Published"
 
 # Media storage
 media_folder: "public/images/blog"
