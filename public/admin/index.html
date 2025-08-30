@@ -28,41 +28,87 @@
 <body>
   <div id="nc-root"></div>
   
-  <!-- Custom Bulk Import Button -->
-  <div id="bulk-import-button" style="
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 9999;
-    background: #2196f3;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.2s ease;
-  " onclick="window.open('/admin/blog-import', '_blank')">
-    📊 Bulk CSV Import
-  </div>
+  <script>
+    // Wait for CMS to load and inject the bulk import button
+    function injectBulkImportButton() {
+      // Wait for the CMS interface to be ready
+      const checkForCMS = setInterval(() => {
+        const cmsRoot = document.querySelector('#nc-root');
+        if (cmsRoot && cmsRoot.innerHTML.trim() !== '') {
+          // Try to find the blog collection page
+          setTimeout(() => {
+            const blogHeader = document.querySelector('[data-testid="collection-header"], .css-1jp8eo6, [class*="collection-header"]');
+            const actionButtons = document.querySelector('[class*="action"], [class*="button-group"], [data-testid="action-buttons"]');
+            
+            // Look for existing buttons container or create one
+            let targetContainer = actionButtons || blogHeader;
+            
+            // If we can't find specific containers, look for any element that might contain action buttons
+            if (!targetContainer) {
+              const possibleContainers = document.querySelectorAll('[class*="header"], [class*="toolbar"], [class*="actions"]');
+              targetContainer = possibleContainers[possibleContainers.length - 1]; // Get the last one which is likely the most specific
+            }
+            
+            if (targetContainer && !document.querySelector('#bulk-import-button')) {
+              const bulkButton = document.createElement('button');
+              bulkButton.id = 'bulk-import-button';
+              bulkButton.innerHTML = '📊 Bulk CSV Import';
+              bulkButton.style.cssText = `
+                background: #dc2626;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 6px;
+                border: 1px solid #dc2626;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                margin-left: 8px;
+                transition: all 0.2s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+              `;
+              
+              bulkButton.addEventListener('click', () => {
+                window.open('/admin/blog-import', '_blank');
+              });
+              
+              bulkButton.addEventListener('mouseenter', () => {
+                bulkButton.style.background = '#b91c1c';
+                bulkButton.style.borderColor = '#b91c1c';
+              });
+              
+              bulkButton.addEventListener('mouseleave', () => {
+                bulkButton.style.background = '#dc2626';
+                bulkButton.style.borderColor = '#dc2626';
+              });
+              
+              targetContainer.appendChild(bulkButton);
+              clearInterval(checkForCMS);
+            }
+          }, 1000);
+        }
+      }, 500);
+      
+      // Clear interval after 30 seconds to avoid infinite checking
+      setTimeout(() => clearInterval(checkForCMS), 30000);
+    }
+    
+    // Start checking when page loads
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', injectBulkImportButton);
+    } else {
+      injectBulkImportButton();
+    }
+    
+    // Also check when hash changes (for SPA navigation)
+    window.addEventListener('hashchange', () => {
+      setTimeout(injectBulkImportButton, 1000);
+    });
+  </script>
 
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
   
-  <script>
-    // Style the bulk import button on hover
-    document.getElementById('bulk-import-button').addEventListener('mouseenter', function() {
-      this.style.background = '#1976d2';
-      this.style.transform = 'translateY(-2px)';
-    });
-    
-    document.getElementById('bulk-import-button').addEventListener('mouseleave', function() {
-      this.style.background = '#2196f3';
-      this.style.transform = 'translateY(0px)';
-    });
-  </script>
 </body>
 </html>
