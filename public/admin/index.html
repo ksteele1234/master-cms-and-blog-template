@@ -24,36 +24,45 @@
       text-decoration: underline;
     }
     
-    /* Custom status badge styles for CMS */
+    /* Enhanced status badge styles for CMS */
     .cms-status-badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 10px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-left: 8px;
+      letter-spacing: 0.8px;
+      margin-left: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      position: relative;
+      top: -1px;
     }
     .cms-status-draft {
-      background-color: #fce4ec;
-      color: #c2185b;
-      border: 1px solid #f8bbd9;
+      background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+      color: #ad1457;
+      border: 1px solid #e91e63;
     }
     .cms-status-in_review {
-      background-color: #fff3e0;
+      background: linear-gradient(135deg, #fff8e1, #ffecb3);
       color: #f57700;
-      border: 1px solid #ffcc02;
+      border: 1px solid #ff9800;
     }
     .cms-status-ready {
-      background-color: #e8f5e8;
+      background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
       color: #2e7d32;
-      border: 1px solid #81c784;
+      border: 1px solid #4caf50;
     }
     .cms-status-published {
-      background-color: #e3f2fd;
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
       color: #1976d2;
-      border: 1px solid #90caf9;
+      border: 1px solid #2196f3;
+    }
+    
+    /* Hide default status text in titles */
+    .cms-entry-enhanced .cms-title-clean {
+      display: inline-block;
     }
   </style>
 </head>
@@ -139,9 +148,9 @@
       setTimeout(injectBulkImportButton, 1000);
     });
     
-    // Add status badge enhancement with debugging
+    // Enhanced status badge system
     function enhanceStatusDisplay() {
-      console.log('🔍 Starting status enhancement check...');
+      console.log('🔍 Starting enhanced status badge system...');
       
       const checkForEntries = setInterval(() => {
         const entries = document.querySelectorAll('[class*="entry-card"], [class*="collection-entry"], [data-testid*="entry"], .css-1jp8eo6, .css-1dbjc4n');
@@ -151,53 +160,82 @@
           entries.forEach((entry, index) => {
             if (entry.dataset.statusEnhanced) return; // Skip if already enhanced
             
-            // Debug the entry structure
-            console.log(`📝 Entry ${index}:`, {
-              innerHTML: entry.innerHTML.substring(0, 200),
-              textContent: entry.textContent?.substring(0, 200),
-              classes: entry.className
-            });
-            
+            // Find the title element
             const titleElement = entry.querySelector('h2, [class*="title"], [class*="heading"], .css-901oao');
             if (titleElement) {
-              const text = titleElement.textContent || '';
-              console.log(`📖 Title text: "${text}"`);
+              const originalText = titleElement.textContent || '';
+              console.log(`📖 Processing entry ${index}: "${originalText}"`);
               
-              // Extract status from the summary text - multiple patterns
+              // Extract status from the summary text
               let status = null;
-              if (text.includes(' - draft - ')) status = 'draft';
-              else if (text.includes(' - in_review - ')) status = 'in_review';
-              else if (text.includes(' - ready - ')) status = 'ready';
-              else if (text.includes(' - published - ')) status = 'published';
-              else if (text.toLowerCase().includes('draft')) status = 'draft';
-              else if (text.toLowerCase().includes('review')) status = 'in_review';
-              else if (text.toLowerCase().includes('ready')) status = 'ready';
-              else if (text.toLowerCase().includes('published')) status = 'published';
+              let cleanTitle = originalText;
               
-              console.log(`🏷️ Detected status: "${status}" from text: "${text}"`);
+              // Remove status indicators from title and detect status
+              if (originalText.includes(' - draft - ')) {
+                status = 'draft';
+                cleanTitle = originalText.replace(' - draft - ', ' - ').replace(/ - $/, '');
+              } else if (originalText.includes(' - in_review - ')) {
+                status = 'in_review';
+                cleanTitle = originalText.replace(' - in_review - ', ' - ').replace(/ - $/, '');
+              } else if (originalText.includes(' - ready - ')) {
+                status = 'ready';
+                cleanTitle = originalText.replace(' - ready - ', ' - ').replace(/ - $/, '');
+              } else if (originalText.includes(' - published - ')) {
+                status = 'published';
+                cleanTitle = originalText.replace(' - published - ', ' - ').replace(/ - $/, '');
+              } else if (originalText.toLowerCase().includes('draft')) {
+                status = 'draft';
+              } else if (originalText.toLowerCase().includes('review')) {
+                status = 'in_review';
+              } else if (originalText.toLowerCase().includes('ready')) {
+                status = 'ready';
+              } else {
+                status = 'published'; // Default to published
+              }
               
-              if (status && !titleElement.querySelector('.cms-status-badge')) {
+              console.log(`🏷️ Detected status: "${status}" for: "${cleanTitle}"`);
+              
+              // Clean the title text
+              titleElement.textContent = cleanTitle;
+              
+              // Find or create a container for the badge (look for date/metadata area)
+              let badgeContainer = entry.querySelector('.cms-badge-container');
+              if (!badgeContainer) {
+                // Try to find the date/metadata container
+                const metaContainer = entry.querySelector('[class*="meta"], [class*="date"], .css-901oao:not(h2)');
+                if (metaContainer) {
+                  badgeContainer = metaContainer;
+                } else {
+                  // Create a badge container after the title
+                  badgeContainer = document.createElement('div');
+                  badgeContainer.className = 'cms-badge-container';
+                  badgeContainer.style.marginTop = '8px';
+                  titleElement.parentNode.insertBefore(badgeContainer, titleElement.nextSibling);
+                }
+              }
+              
+              // Create and add the badge
+              if (!badgeContainer.querySelector('.cms-status-badge')) {
                 const badge = document.createElement('span');
                 badge.className = `cms-status-badge cms-status-${status}`;
                 
-                let statusText = status;
-                if (status === 'in_review') statusText = 'IN REVIEW';
-                else statusText = status.toUpperCase();
-                
+                let statusText = status === 'in_review' ? 'IN REVIEW' : status.toUpperCase();
                 badge.textContent = statusText;
-                titleElement.appendChild(badge);
-                entry.dataset.statusEnhanced = 'true';
+                
+                // Add the badge to the container
+                if (badgeContainer.children.length > 0) {
+                  badgeContainer.appendChild(badge);
+                } else {
+                  badgeContainer.appendChild(badge);
+                }
+                
                 console.log(`✅ Added ${statusText} badge to entry`);
-              } else if (!status) {
-                console.log('❌ No status detected, adding default PUBLISHED badge');
-                const badge = document.createElement('span');
-                badge.className = 'cms-status-badge cms-status-published';
-                badge.textContent = 'PUBLISHED';
-                titleElement.appendChild(badge);
-                entry.dataset.statusEnhanced = 'true';
               }
+              
+              entry.dataset.statusEnhanced = 'true';
+              entry.classList.add('cms-entry-enhanced');
             } else {
-              console.log('❌ No title element found in entry');
+              console.log(`❌ No title element found in entry ${index}`);
             }
           });
         }
