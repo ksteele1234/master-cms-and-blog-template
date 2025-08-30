@@ -5,10 +5,6 @@ backend:
 # Local development support
 local_backend: true
 
-# Required for authentication
-media_folder: "public/images/blog"
-public_folder: "/images/blog"
-
 # Site configuration
 site_url: https://hrx-cpas.netlify.app
 display_url: https://hrx-cpas.netlify.app
