@@ -21,6 +21,22 @@ const Blog = () => {
 
   const featuredPosts = posts.filter(post => post.featured);
   const regularPosts = filteredPosts.filter(post => !post.featured);
+
+  // Function to get status badge style
+  const getStatusBadgeStyle = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'draft':
+        return 'bg-status-draft text-status-draft-foreground';
+      case 'in review':
+        return 'bg-status-review text-status-review-foreground';
+      case 'ready':
+        return 'bg-status-ready text-status-ready-foreground';
+      case 'published':
+        return 'bg-status-published text-status-published-foreground';
+      default:
+        return 'bg-status-published text-status-published-foreground';
+    }
+  };
   
 
   if (loading) {
@@ -79,6 +95,11 @@ const Blog = () => {
                           <Calendar className="w-4 h-4 mr-1" />
                           {new Date(post.date).toLocaleDateString()}
                         </span>
+                        <Badge 
+                          className={`text-xs px-2 py-1 ${getStatusBadgeStyle(post.status)}`}
+                        >
+                          {post.status}
+                        </Badge>
                         <span className="flex items-center">
                           <Clock className="w-4 h-4 mr-1" />
                           {post.readingTime}
@@ -131,10 +152,17 @@ const Blog = () => {
                 </h3>
                 <p className="text-gray-600 text-sm mb-4">{post.excerpt}</p>
                 <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-                  <span className="flex items-center">
-                    <Calendar className="w-3 h-3 mr-1" />
-                    {new Date(post.date).toLocaleDateString()}
-                  </span>
+                  <div className="flex items-center space-x-2">
+                    <span className="flex items-center">
+                      <Calendar className="w-3 h-3 mr-1" />
+                      {new Date(post.date).toLocaleDateString()}
+                    </span>
+                    <Badge 
+                      className={`text-xs px-2 py-1 ${getStatusBadgeStyle(post.status)}`}
+                    >
+                      {post.status}
+                    </Badge>
+                  </div>
                   <span className="flex items-center">
                     <Clock className="w-3 h-3 mr-1" />
                     {post.readingTime}
