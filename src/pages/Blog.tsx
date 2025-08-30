@@ -25,7 +25,9 @@ const Blog = () => {
   // Function to get display status and badge style
   const getDisplayStatus = (post: any) => {
     // If no status field exists or status is empty/undefined, default to 'PUBLISHED'
-    return post.status || 'PUBLISHED';
+    const displayStatus = post.status || 'PUBLISHED';
+    console.log('Post status for badge:', post.title, 'status field:', post.status, 'final display:', displayStatus);
+    return displayStatus;
   };
 
   const getStatusBadgeStyle = (status: string) => {
