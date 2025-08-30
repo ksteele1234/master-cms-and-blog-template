@@ -136,30 +136,80 @@ ${post.content}
           const slug = generateSlug(post.title, post.date);
           const markdownContent = generateMarkdownContent(post);
           
-          // Use Git Gateway API to create the file
-          const response = await fetch('/.netlify/git/github/contents/content/blog/' + slug + '.md', {
+          // Create a unique branch name for the editorial workflow
+          const branchName = `cms/${slug}-${Date.now()}`;
+          
+          // First, create a new branch for the editorial workflow
+          const branchResponse = await fetch('/.netlify/git/github/git/refs', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+              'X-Decap-CMS-Branch': branchName,
+              'X-Decap-CMS-Entry': slug,
+            },
+            body: JSON.stringify({
+              ref: `refs/heads/${branchName}`,
+              sha: await getLatestCommitSha(token)
+            })
+          });
+
+          if (!branchResponse.ok) {
+            const errorData = await branchResponse.text();
+            errors.push(`Row ${index + 1}: Failed to create branch - ${errorData}`);
+            continue;
+          }
+
+          // Create the file in the new branch
+          const fileResponse = await fetch(`/.netlify/git/github/contents/content/blog/${slug}.md`, {
             method: 'PUT',
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
+              'X-Decap-CMS-Branch': branchName,
+              'X-Decap-CMS-Entry': slug,
             },
             body: JSON.stringify({
-              message: `Add blog post: ${post.title}`,
+              message: `Create blog post: ${post.title}`,
               content: btoa(unescape(encodeURIComponent(markdownContent))),
-              branch: 'main'
+              branch: branchName
             })
           });
 
-          if (!response.ok) {
-            const errorData = await response.text();
+          if (!fileResponse.ok) {
+            const errorData = await fileResponse.text();
             errors.push(`Row ${index + 1}: Failed to create file - ${errorData}`);
+            continue;
+          }
+
+          // Create the editorial workflow entry
+          const workflowResponse = await fetch('/.netlify/git/github/pulls', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+              'X-Decap-CMS-Branch': branchName,
+              'X-Decap-CMS-Entry': slug,
+            },
+            body: JSON.stringify({
+              title: `Draft: ${post.title}`,
+              body: `Created via bulk import`,
+              head: branchName,
+              base: 'main',
+              draft: true
+            })
+          });
+
+          if (!workflowResponse.ok) {
+            const errorData = await workflowResponse.text();
+            errors.push(`Row ${index + 1}: Failed to create workflow entry - ${errorData}`);
             continue;
           }
 
           successCount++;
           
           // Small delay between API calls
-          await new Promise(resolve => setTimeout(resolve, 200));
+          await new Promise(resolve => setTimeout(resolve, 500));
         } catch (error) {
           errors.push(`Row ${index + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
@@ -170,6 +220,22 @@ ${post.content}
 
     setResults({ success: successCount, errors });
     setIsProcessing(false);
+  };
+
+  const getLatestCommitSha = async (token: string): Promise<string> => {
+    const response = await fetch('/.netlify/git/github/git/refs/heads/main', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to get latest commit SHA');
+    }
+    
+    const data = await response.json();
+    return data.object.sha;
   };
 
   const getGitHubToken = async (): Promise<string> => {
@@ -400,15 +466,16 @@ ${post.content}
                   </AlertDescription>
                 </Alert>
               )}
-                <div className="text-sm text-gray-600">
+                 <div className="text-sm text-gray-600">
                 <p><strong>Next steps:</strong></p>
                 <ol className="list-decimal pl-4 mt-2 space-y-1">
-                  <li><strong>Review Posts:</strong> Go to <a href="/admin/#/collections/blog" className="text-blue-600 hover:underline">/admin/#/collections/blog</a> to review and edit your posts</li>
+                  <li><strong>Review Drafts:</strong> Go to <a href="/admin/#/workflow" className="text-blue-600 hover:underline">/admin/#/workflow</a> to see your imported posts in the "Draft" column</li>
                   <li><strong>Upload Images:</strong> Make sure all referenced images are uploaded to the <code className="bg-gray-100 px-1 rounded">public/images/blog/</code> directory</li>
-                  <li><strong>Publish:</strong> Change the status from "draft" to "published" for each post you want to make live</li>
+                  <li><strong>Move to Review:</strong> Drag posts from "Draft" to "In Review" when ready for approval</li>
+                  <li><strong>Publish:</strong> Move posts from "Ready" to "Published" to make them live on the website</li>
                 </ol>
                 <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
-                  <p className="text-blue-800 text-xs"><strong>Success!</strong> Your blog posts have been created and are available in the CMS for review.</p>
+                  <p className="text-blue-800 text-xs"><strong>Success!</strong> Your blog posts have been created as drafts in the editorial workflow. They will not appear on the website until published.</p>
                 </div>
               </div>
             </CardContent>
