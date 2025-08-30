@@ -28,40 +28,18 @@ collections:
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     preview_path: "blog/{{slug}}"
-    summary: "{{title}} - {{status}} - {{date | date('MMM DD, YYYY')}}"
-    sortable_fields: ["date", "title", "status", "featured"]
+    summary: "{{title}} - {{date | date('MMM DD, YYYY')}}"
+    sortable_fields: ["date", "title", "featured"]
     description: "Manage individual blog posts or use [Bulk CSV Import](/admin/blog-import) for multiple posts"
     view_filters:
-      - label: "Draft"
-        field: status
-        pattern: "draft"
-      - label: "In Review"
-        field: status 
-        pattern: "in_review"
-      - label: "Ready"
-        field: status
-        pattern: "ready"
-      - label: "Published"
-        field: status
-        pattern: "published"
       - label: "Featured"
         field: featured
         pattern: true
     view_groups:
-      - label: "Status"
-        field: status
       - label: "Category" 
         field: category
     fields:
       - {label: "Title", name: "title", widget: "string", hint: "This will be the main headline of your blog post"}
-      - {label: "Status", name: "status", widget: "select", default: "draft",
-         options: [
-           {label: "Draft", value: "draft"},
-           {label: "In Review", value: "in_review"}, 
-           {label: "Ready", value: "ready"},
-           {label: "Published", value: "published"}
-         ],
-         hint: "Set the publication status"}
       - {label: "Publish Date", name: "date", widget: "datetime", hint: "You can schedule posts for future publication"}
       - {label: "Author", name: "author", widget: "string", default: "HRX CPAs Team"}
       - {label: "Category", name: "category", widget: "select", 

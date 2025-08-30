@@ -136,73 +136,32 @@ ${post.content}
           const slug = generateSlug(post.title, post.date);
           const markdownContent = generateMarkdownContent(post);
           
-          // Create a unique branch name for the editorial workflow
-          const branchName = `cms/${slug}-${Date.now()}`;
-          
-          // First, create a new branch for the editorial workflow
-          const branchResponse = await fetch('/.netlify/git/github/git/refs', {
+          // Use Decap CMS editorial workflow API to create draft entries
+          const entryData = {
+            slug: slug,
+            raw: markdownContent,
+            path: `content/blog/${slug}.md`,
+            partial: false,
+            author: {
+              login: user.user_metadata?.full_name || user.email,
+              name: user.user_metadata?.full_name || user.email,
+              email: user.email
+            }
+          };
+
+          // Create entry through Decap CMS editorial workflow
+          const response = await fetch('/.netlify/git/github/entries/blog', {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
-              'X-Decap-CMS-Branch': branchName,
-              'X-Decap-CMS-Entry': slug,
             },
-            body: JSON.stringify({
-              ref: `refs/heads/${branchName}`,
-              sha: await getLatestCommitSha(token)
-            })
+            body: JSON.stringify(entryData)
           });
 
-          if (!branchResponse.ok) {
-            const errorData = await branchResponse.text();
-            errors.push(`Row ${index + 1}: Failed to create branch - ${errorData}`);
-            continue;
-          }
-
-          // Create the file in the new branch
-          const fileResponse = await fetch(`/.netlify/git/github/contents/content/blog/${slug}.md`, {
-            method: 'PUT',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-              'X-Decap-CMS-Branch': branchName,
-              'X-Decap-CMS-Entry': slug,
-            },
-            body: JSON.stringify({
-              message: `Create blog post: ${post.title}`,
-              content: btoa(unescape(encodeURIComponent(markdownContent))),
-              branch: branchName
-            })
-          });
-
-          if (!fileResponse.ok) {
-            const errorData = await fileResponse.text();
-            errors.push(`Row ${index + 1}: Failed to create file - ${errorData}`);
-            continue;
-          }
-
-          // Create the editorial workflow entry
-          const workflowResponse = await fetch('/.netlify/git/github/pulls', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-              'X-Decap-CMS-Branch': branchName,
-              'X-Decap-CMS-Entry': slug,
-            },
-            body: JSON.stringify({
-              title: `Draft: ${post.title}`,
-              body: `Created via bulk import`,
-              head: branchName,
-              base: 'main',
-              draft: true
-            })
-          });
-
-          if (!workflowResponse.ok) {
-            const errorData = await workflowResponse.text();
-            errors.push(`Row ${index + 1}: Failed to create workflow entry - ${errorData}`);
+          if (!response.ok) {
+            const errorData = await response.text();
+            errors.push(`Row ${index + 1}: Failed to create editorial workflow entry - ${errorData}`);
             continue;
           }
 
