@@ -83,7 +83,7 @@ const BlogImport = () => {
     
     return `---
 title: "${post.title}"
-status: "${post.status || 'draft'}"
+status: "draft"
 date: "${post.date}"
 author: "${post.author || 'HRX CPAs Team'}"
 category: "${post.category}"
@@ -268,7 +268,7 @@ ${post.content}
                 <li><strong>tags</strong> - Comma-separated tags</li>
                 <li><strong>readingTime</strong> - Reading time estimate</li>
                 <li><strong>featured</strong> - true/false for featured posts</li>
-                <li><strong>status</strong> - Publication status (draft, in_review, ready, published)</li>
+                <li><strong>status</strong> - Publication status (ignored - all imports set to draft)</li>
               </ul>
             </div>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
