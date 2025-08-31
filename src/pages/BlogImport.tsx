@@ -12,29 +12,45 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 // GitHub API configuration
-const GH_OWNER = import.meta.env.VITE_GH_OWNER ?? 'ksteele1234';
-const GH_REPO = import.meta.env.VITE_GH_REPO ?? 'hx-cpas-connect';
-const DEFAULT_BRANCH = 'main';
+const owner = 'ksteele1234';
+const repo = 'hx-cpas-connect';
+const proxyUrl = '/.netlify/functions/github-proxy';
 
-async function gh(path: string, init: RequestInit = {}) {
-  const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}${path.startsWith('/') ? path : '/' + path}`;
-  const token = getToken();
-  
-  const payload = {
-    url,
-    method: init.method ?? 'GET',
-    headers: { Authorization: `Bearer ${token}` },
-    body: init.body ? JSON.parse(init.body as string) : undefined,
+/** Always call GitHub through the Netlify proxy, with Authorization */
+async function gh<T = any>(path: string, init: RequestInit & { body?: any } = {}) {
+  // however you store the token (input, localStorage, etc.)
+  const token = getToken()?.trim() || '';
+
+  const url = path.startsWith('http')
+    ? path
+    : `https://api.github.com/repos/${owner}/${repo}/${path.replace(/^\/+/, '')}`;
+
+  const headers: Record<string, string> = {
+    'content-type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(init.headers as Record<string, string> || {}),
   };
-  
-  const r = await fetch('/.netlify/functions/github-proxy', {
+
+  const res = await fetch(proxyUrl, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      url,
+      method: init.method || 'GET',
+      headers,
+      body: init.body ?? undefined,
+    }),
   });
-  
-  if (!r.ok) throw new Error(await r.text());
-  return r.json();
+
+  const text = await res.text();
+  const isJSON = (res.headers.get('content-type') || '').includes('application/json');
+  const data = isJSON && text ? JSON.parse(text) : text;
+
+  if (!res.ok) {
+    console.error('GitHub error', res.status, data);
+    throw new Error(data?.message || `GitHub error ${res.status}`);
+  }
+  return data as T;
 }
 
 function getToken(): string {
@@ -501,7 +517,7 @@ ${post.content}
                   <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                     GitHub Settings
                   </a>{' '}
-                  with repository scope for {GH_OWNER}/{GH_REPO}
+                  with repository scope for {owner}/{repo}
                 </p>
                 {githubToken && (
                   <Button 
