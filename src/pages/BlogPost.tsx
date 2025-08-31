@@ -172,10 +172,10 @@ const BlogPost = () => {
             <nav className="space-y-2 text-sm">
               {post.content
                 .split('\n')
-                .filter(line => line.startsWith('##'))
+                .filter(line => line.startsWith('## ') && !line.startsWith('### '))
                 .map((heading, index) => {
-                  const text = heading.replace(/^##\s*/, '');
-                  const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                  const text = heading.replace(/^##\s*/, '').trim();
+                  const id = text.toLowerCase().replace(/[^a-z0-9\s]+/g, '').replace(/\s+/g, '-');
                   return (
                     <a 
                       key={index}
@@ -200,7 +200,7 @@ const BlogPost = () => {
                 h1: ({children}) => <h2 className="text-2xl font-bold mt-6 mb-3">{children}</h2>,
                 h2: ({children}) => {
                   const text = typeof children === 'string' ? children : children?.toString() || '';
-                  const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                  const id = text.toLowerCase().replace(/[^a-z0-9\s]+/g, '').replace(/\s+/g, '-');
                   return <h2 id={id} className="text-2xl font-bold mt-6 mb-3">{children}</h2>;
                 },
                 h3: ({children}) => <h3 className="text-xl font-semibold mt-4 mb-2">{children}</h3>,
