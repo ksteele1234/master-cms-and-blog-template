@@ -215,20 +215,17 @@ ${post.content}
   };
 
   const getMainBranchSha = async (): Promise<string> => {
-    const data = await gh('/git/refs/heads/main');
+    const data = await gh(`/git/refs/heads/${DEFAULT_BRANCH}`);
     return data.object.sha;
   };
 
   const createBranch = async (branchName: string, sha: string): Promise<void> => {
     await gh('/git/refs', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+      body: {
         ref: `refs/heads/${branchName}`,
         sha: sha
-      })
+      }
     });
   };
 
@@ -237,29 +234,23 @@ ${post.content}
     
     await gh(`/contents/content/blog/${slug}.md`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+      body: {
         message: `Create blog post: ${title}`,
         content: encodedContent,
         branch: branchName
-      })
+      }
     });
   };
 
   const createPullRequest = async (branchName: string, title: string): Promise<number> => {
     const pr = await gh('/pulls', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+      body: {
         title: `Create blog post: ${title}`,
         head: branchName,
-        base: 'main',
+        base: DEFAULT_BRANCH,
         body: 'Imported via bulk CSV'
-      })
+      }
     });
     return pr.number;
   };
@@ -268,12 +259,9 @@ ${post.content}
     try {
       await gh(`/issues/${prNumber}/labels`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
+        body: { 
           labels: ['decap-cms/draft'] 
-        })
+        }
       });
     } catch (error) {
       // Ignore 404 errors as requested
