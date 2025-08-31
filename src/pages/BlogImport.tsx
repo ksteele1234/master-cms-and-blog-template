@@ -85,6 +85,17 @@ const BlogImport = () => {
       skipEmptyLines: true,
       complete: (result) => {
         const data = result.data as BlogPostData[];
+        
+        // Validate CSV data
+        const validationErrors = validateCsvData(data);
+        if (validationErrors.length > 0) {
+          setPostProgress([]);
+          setIsProcessing(false);
+          // Show validation errors in an alert or similar UI
+          alert(`CSV Validation Errors:\n${validationErrors.join('\n')}`);
+          return;
+        }
+        
         setCsvData(data);
         setPostProgress([]);
         setShowPreview(true);
@@ -93,19 +104,52 @@ const BlogImport = () => {
       error: (error) => {
         setPostProgress([]);
         setIsProcessing(false);
+        alert(`CSV Parse Error: ${error.message}`);
       }
     });
   };
 
-  const generateSlug = (title: string, date: string): string => {
-    const dateStr = new Date(date).toISOString().split('T')[0];
-    const slugTitle = title
+  const generateSlug = (title: string): string => {
+    return title
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
+      .replace(/[^a-z0-9\s-]/g, '') // Remove unsafe characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single
+      .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
       .trim();
-    return `${dateStr}-${slugTitle}`;
+  };
+
+  const validateCsvData = (data: BlogPostData[]): string[] => {
+    const errors: string[] = [];
+    const requiredColumns = ['title', 'date', 'category', 'author', 'excerpt', 'featuredImage', 'imageAlt', 'content'];
+    
+    data.forEach((row, index) => {
+      const rowNum = index + 1;
+      
+      // Check required columns
+      requiredColumns.forEach(column => {
+        if (!row[column as keyof BlogPostData] || String(row[column as keyof BlogPostData]).trim() === '') {
+          errors.push(`Row ${rowNum}: Missing required column '${column}'`);
+        }
+      });
+      
+      // Validate featuredImage path
+      if (row.featuredImage && !row.featuredImage.startsWith('public/images/blog/')) {
+        errors.push(`Row ${rowNum}: featuredImage must start with 'public/images/blog/' (got: ${row.featuredImage})`);
+      }
+      
+      // Validate date format
+      if (row.date && isNaN(Date.parse(row.date))) {
+        errors.push(`Row ${rowNum}: Invalid date format '${row.date}'`);
+      }
+      
+      // Validate title for slug generation
+      if (row.title && generateSlug(row.title).length === 0) {
+        errors.push(`Row ${rowNum}: Title '${row.title}' cannot be converted to a valid slug`);
+      }
+    });
+    
+    return errors;
   };
 
   const ensureUniqueSlug = async (baseSlug: string): Promise<string> => {
@@ -261,7 +305,7 @@ ${post.content}
             continue;
           }
 
-          const baseSlug = generateSlug(post.title, post.date);
+          const baseSlug = generateSlug(post.title);
           const uniqueSlug = await ensureUniqueSlug(baseSlug);
           progress.slug = uniqueSlug;
 
@@ -314,7 +358,7 @@ ${post.content}
         author: "Hiram Parmar, CPA",
         category: "Tax Planning",
         excerpt: "This is a sample excerpt that describes what the blog post is about.",
-        featuredImage: "/images/blog/sample-image.jpg",
+        featuredImage: "public/images/blog/sample-image.jpg",
         imageAlt: "Sample image description for accessibility",
         seoTitle: "Sample SEO Title | HRX CPAs",
         metaDescription: "Sample meta description for SEO purposes",
@@ -368,15 +412,19 @@ ${post.content}
             <div>
               <h3 className="font-semibold mb-2">Required CSV Columns:</h3>
               <ul className="list-disc pl-6 space-y-1 text-sm">
-                <li><strong>title</strong> - The blog post title</li>
+                <li><strong>title</strong> - The blog post title (used for slug generation)</li>
                 <li><strong>date</strong> - Publication date (YYYY-MM-DD format)</li>
-                <li><strong>author</strong> - Author name</li>
                 <li><strong>category</strong> - Post category</li>
+                <li><strong>author</strong> - Author name</li>
                 <li><strong>excerpt</strong> - Brief description</li>
-                <li><strong>featuredImage</strong> - Image path (e.g., /images/blog/image.jpg)</li>
+                <li><strong>featuredImage</strong> - Image path starting with public/images/blog/</li>
                 <li><strong>imageAlt</strong> - Image alt text for accessibility</li>
                 <li><strong>content</strong> - Full blog post content (markdown supported)</li>
               </ul>
+              <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded text-xs">
+                <strong>Slug Rules:</strong> Generated from title using kebab-case (lowercase, hyphens). 
+                Unsafe characters removed. Duplicates get -2, -3 suffixes.
+              </div>
             </div>
             <div>
               <h3 className="font-semibold mb-2">Optional Columns:</h3>
@@ -404,7 +452,7 @@ ${post.content}
                 </ol>
                 <p><strong>In your CSV:</strong></p>
                 <ul className="list-disc pl-4 space-y-1">
-                  <li>Use the path format: <code className="bg-blue-100 px-1 rounded">/images/blog/your-image.jpg</code></li>
+                  <li>Use the path format: <code className="bg-blue-100 px-1 rounded">public/images/blog/your-image.jpg</code></li>
                   <li>Always include descriptive alt text for accessibility</li>
                   <li>Ensure image names match exactly (case-sensitive)</li>
                 </ul>
