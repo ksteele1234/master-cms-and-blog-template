@@ -55,10 +55,18 @@ interface BlogPostData {
   content: string;
 }
 
+interface PostProgress {
+  slug: string;
+  branchCreated: boolean;
+  fileCommitted: boolean;
+  prNumber?: number;
+  error?: string;
+}
+
 const BlogImport = () => {
   const [csvData, setCsvData] = useState<BlogPostData[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [results, setResults] = useState<{ success: number; errors: string[] }>({ success: 0, errors: [] });
+  const [postProgress, setPostProgress] = useState<PostProgress[]>([]);
   const [showPreview, setShowPreview] = useState(false);
   const [githubToken, setGithubToken] = useState(() => localStorage.getItem('hrx_blog_import_gh_token') || '');
 
@@ -78,11 +86,12 @@ const BlogImport = () => {
       complete: (result) => {
         const data = result.data as BlogPostData[];
         setCsvData(data);
+        setPostProgress([]);
         setShowPreview(true);
         setIsProcessing(false);
       },
       error: (error) => {
-        setResults({ success: 0, errors: [error.message] });
+        setPostProgress([]);
         setIsProcessing(false);
       }
     });
@@ -99,9 +108,25 @@ const BlogImport = () => {
     return `${dateStr}-${slugTitle}`;
   };
 
-  const generateMarkdownContent = (post: BlogPostData): string => {
-    const slug = generateSlug(post.title, post.date);
+  const ensureUniqueSlug = async (baseSlug: string): Promise<string> => {
+    let slug = baseSlug;
+    let counter = 2;
     
+    while (true) {
+      try {
+        // Check if branch already exists
+        await gh(`/git/refs/heads/cms/blog/${slug}`);
+        // If we get here, branch exists, try next
+        slug = `${baseSlug}-${counter}`;
+        counter++;
+      } catch (error) {
+        // Branch doesn't exist, we can use this slug
+        return slug;
+      }
+    }
+  };
+
+  const generateMarkdownContent = (post: BlogPostData): string => {
     return `---
 title: "${post.title}"
 status: "draft"
@@ -133,7 +158,7 @@ ${post.content}
   };
 
   const getMainBranchSha = async (): Promise<string> => {
-    const data = await gh('/git/ref/heads/main');
+    const data = await gh('/git/refs/heads/main');
     return data.object.sha;
   };
 
@@ -159,7 +184,7 @@ ${post.content}
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        message: `Create blog post ${title}`,
+        message: `Create blog post: ${title}`,
         content: encodedContent,
         branch: branchName
       })
@@ -183,26 +208,28 @@ ${post.content}
   };
 
   const addDecapLabel = async (prNumber: number): Promise<void> => {
-    await gh(`/issues/${prNumber}/labels`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        labels: ['decap-cms/pending_publish'] 
-      })
-    });
+    try {
+      await gh(`/issues/${prNumber}/labels`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          labels: ['decap-cms/draft'] 
+        })
+      });
+    } catch (error) {
+      // Ignore 404 errors as requested
+      console.warn('Could not add decap-cms/draft label:', error);
+    }
   };
 
   const createBlogPosts = async () => {
-    const errors: string[] = [];
-    let successCount = 0;
     setIsProcessing(true);
+    setPostProgress([]);
 
     try {
       if (!githubToken) {
-        errors.push('GitHub token is required');
-        setResults({ success: 0, errors });
         setIsProcessing(false);
         return;
       }
@@ -210,51 +237,71 @@ ${post.content}
       // Preflight checks
       const hasAccess = await checkRepoAccess();
       if (!hasAccess) {
-        errors.push('Cannot access repository. Check your GitHub token and repository settings.');
-        setResults({ success: 0, errors });
         setIsProcessing(false);
         return;
       }
 
       const mainSha = await getMainBranchSha();
+      const progressArray: PostProgress[] = [];
 
       for (let index = 0; index < csvData.length; index++) {
         const post = csvData[index];
+        const progress: PostProgress = {
+          slug: '',
+          branchCreated: false,
+          fileCommitted: false,
+          error: undefined
+        };
+
         try {
           if (!post.title || !post.date || !post.content) {
-            errors.push(`Row ${index + 1}: Missing required fields (title, date, or content)`);
+            progress.error = 'Missing required fields (title, date, or content)';
+            progressArray.push(progress);
+            setPostProgress([...progressArray]);
             continue;
           }
 
-          const slug = generateSlug(post.title, post.date);
-          const branchName = `cms/blog/${slug}`;
+          const baseSlug = generateSlug(post.title, post.date);
+          const uniqueSlug = await ensureUniqueSlug(baseSlug);
+          progress.slug = uniqueSlug;
+
+          const branchName = `cms/blog/${uniqueSlug}`;
           const markdownContent = generateMarkdownContent(post);
           
           // Create branch for this post
           await createBranch(branchName, mainSha);
+          progress.branchCreated = true;
+          progressArray[index] = { ...progress };
+          setPostProgress([...progressArray]);
           
           // Commit the markdown file to the branch
-          await commitMarkdownFile(branchName, slug, markdownContent, post.title);
+          await commitMarkdownFile(branchName, uniqueSlug, markdownContent, post.title);
+          progress.fileCommitted = true;
+          progressArray[index] = { ...progress };
+          setPostProgress([...progressArray]);
 
           // Create pull request
           const prNumber = await createPullRequest(branchName, post.title);
+          progress.prNumber = prNumber;
+          progressArray[index] = { ...progress };
+          setPostProgress([...progressArray]);
           
-          // Add Decap CMS label
+          // Add Decap CMS label (ignore errors)
           await addDecapLabel(prNumber);
-
-          successCount++;
           
           // Small delay between API calls
           await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
-          errors.push(`Row ${index + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          progress.error = error instanceof Error ? error.message : 'Unknown error';
         }
+        
+        progressArray[index] = progress;
+        setPostProgress([...progressArray]);
       }
     } catch (error) {
-      errors.push(`General error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('General error:', error);
     }
 
-    setResults({ success: successCount, errors });
     setIsProcessing(false);
   };
 
@@ -492,49 +539,101 @@ ${post.content}
           </Card>
         )}
 
+        {/* Progress Section */}
+        {postProgress.length > 0 && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Import Progress</CardTitle>
+              <CardDescription>
+                Processing {csvData.length} blog posts
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {postProgress.map((progress, index) => (
+                  <div key={index} className="border p-3 rounded-lg">
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-medium">{csvData[index]?.title || `Post ${index + 1}`}</h4>
+                      <span className="text-sm text-gray-500">
+                        {progress.slug || 'Generating slug...'}
+                      </span>
+                    </div>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex items-center gap-2">
+                        {progress.branchCreated ? (
+                          <CheckCircle className="w-4 h-4 text-green-600" />
+                        ) : progress.error ? (
+                          <AlertCircle className="w-4 h-4 text-red-600" />
+                        ) : (
+                          <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+                        )}
+                        <span className={progress.branchCreated ? 'text-green-800' : progress.error ? 'text-red-800' : 'text-gray-600'}>
+                          Branch created
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {progress.fileCommitted ? (
+                          <CheckCircle className="w-4 h-4 text-green-600" />
+                        ) : progress.error ? (
+                          <AlertCircle className="w-4 h-4 text-red-600" />
+                        ) : progress.branchCreated ? (
+                          <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+                        ) : (
+                          <div className="w-4 h-4 border-2 border-gray-300 rounded-full" />
+                        )}
+                        <span className={progress.fileCommitted ? 'text-green-800' : progress.error ? 'text-red-800' : progress.branchCreated ? 'text-gray-600' : 'text-gray-400'}>
+                          File committed
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {progress.prNumber ? (
+                          <CheckCircle className="w-4 h-4 text-green-600" />
+                        ) : progress.error ? (
+                          <AlertCircle className="w-4 h-4 text-red-600" />
+                        ) : progress.fileCommitted ? (
+                          <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+                        ) : (
+                          <div className="w-4 h-4 border-2 border-gray-300 rounded-full" />
+                        )}
+                        <span className={progress.prNumber ? 'text-green-800' : progress.error ? 'text-red-800' : progress.fileCommitted ? 'text-gray-600' : 'text-gray-400'}>
+                          {progress.prNumber ? `PR #${progress.prNumber} opened` : 'PR pending'}
+                        </span>
+                      </div>
+                      {progress.error && (
+                        <div className="text-red-600 text-xs mt-1 pl-6">
+                          Error: {progress.error}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Results */}
-        {results.success > 0 || results.errors.length > 0 ? (
+        {postProgress.length > 0 && !isProcessing && (
           <Card>
             <CardHeader>
-              <CardTitle>Import Results</CardTitle>
+              <CardTitle>Import Complete</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {results.success > 0 && (
-                <Alert className="border-green-200 bg-green-50">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <AlertDescription className="text-green-800">
-                    Successfully created {results.success} blog posts as branches in GitHub
-                  </AlertDescription>
-                </Alert>
-              )}
-              {results.errors.length > 0 && (
-                <Alert className="border-red-200 bg-red-50">
-                  <AlertCircle className="h-4 w-4 text-red-600" />
-                  <AlertDescription className="text-red-800">
-                    <div>Errors encountered:</div>
-                    <ul className="list-disc pl-4 mt-2">
-                      {results.errors.map((error, index) => (
-                        <li key={index}>{error}</li>
-                      ))}
-                    </ul>
-                  </AlertDescription>
-                </Alert>
-              )}
-                 <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600">
                 <p><strong>Next steps:</strong></p>
                 <ol className="list-decimal pl-4 mt-2 space-y-1">
                   <li><strong>Review Branches:</strong> Check your GitHub repository for new branches prefixed with <code className="bg-gray-100 px-1 rounded">cms/blog/</code></li>
                   <li><strong>Upload Images:</strong> Make sure all referenced images are uploaded to the <code className="bg-gray-100 px-1 rounded">public/images/blog/</code> directory</li>
-                  <li><strong>Create Pull Requests:</strong> Create pull requests from the blog branches to main for review</li>
+                  <li><strong>Review Pull Requests:</strong> Check the opened PRs for any needed adjustments</li>
                   <li><strong>Merge:</strong> Merge the pull requests to publish the blog posts</li>
                 </ol>
                 <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
-                  <p className="text-blue-800 text-xs"><strong>Success!</strong> Your blog posts have been created as separate branches in GitHub. Create pull requests to merge them.</p>
+                  <p className="text-blue-800 text-xs"><strong>Success!</strong> Your blog posts have been created as separate branches with pull requests following Decap CMS editorial workflow.</p>
                 </div>
               </div>
             </CardContent>
           </Card>
-        ) : null}
+        )}
       </main>
 
       <Footer />
