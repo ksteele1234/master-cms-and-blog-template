@@ -10,6 +10,7 @@ import { Calendar, User, ArrowRight, Clock, Filter, BookOpen, TrendingUp, Shield
 import { Input } from "@/components/ui/input";
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import OptimizedImage from '../components/OptimizedImage';
 
 const Blog = () => {
   console.log('🚀 Blog component rendering...');
@@ -261,10 +262,13 @@ const Blog = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
               {featuredPosts.map((post) => (
                 <Card key={post.slug} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <img 
+                  <OptimizedImage 
                     src={post.featuredImage} 
                     alt={post.imageAlt}
-                    className="w-full h-48 object-cover"
+                    width={400}
+                    height={192}
+                    className="w-full h-48"
+                    priority={true}
                   />
                   <div className="p-6">
                     <Badge variant="secondary" className="mb-3">{post.category}</Badge>
@@ -301,10 +305,12 @@ const Blog = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {regularPosts.map((post) => (
             <Card key={post.slug} className="overflow-hidden hover:shadow-lg transition-shadow">
-              <img 
+              <OptimizedImage 
                 src={post.featuredImage} 
                 alt={post.imageAlt}
-                className="w-full h-48 object-cover"
+                width={400}
+                height={192}
+                className="w-full h-48"
               />
               <div className="p-6">
                 <Badge variant="outline" className="mb-3">{post.category}</Badge>

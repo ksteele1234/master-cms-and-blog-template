@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, User, Clock, ArrowLeft, Share2, BookOpen } from "lucide-react";
 import BlogBreadcrumbs from '../components/BlogBreadcrumbs';
+import OptimizedImage from '../components/OptimizedImage';
 import RelatedPosts from '../components/RelatedPosts';
 import { useBlogPosts } from '../hooks/useBlogPosts';
 import type { BlogPost } from '../hooks/useBlogPosts';
@@ -155,10 +156,12 @@ const BlogPost = () => {
           </div>
 
           {/* Featured Image */}
-          <img 
+          <OptimizedImage 
             src={post.featuredImage} 
             alt={post.imageAlt}
-            className="float-right ml-6 mb-4 w-80 h-48 object-cover rounded-lg"
+            width={320}
+            height={192}
+            className="float-right ml-6 mb-4 w-80 h-48 rounded-lg"
           />
         </header>
 
