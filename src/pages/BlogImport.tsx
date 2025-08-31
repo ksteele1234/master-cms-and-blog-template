@@ -12,7 +12,6 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 // GitHub API configuration
-const GITHUB_API_BASE = 'https://api.github.com';
 const OWNER = import.meta.env.VITE_GH_OWNER!;
 const REPO = import.meta.env.VITE_GH_REPO!;
 
