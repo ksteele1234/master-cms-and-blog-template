@@ -16,6 +16,31 @@ const GITHUB_API_BASE = 'https://api.github.com';
 const OWNER = import.meta.env.VITE_GH_OWNER!;
 const REPO = import.meta.env.VITE_GH_REPO!;
 
+const ghBase = (path: string) =>
+  `https://api.github.com/repos/${OWNER}/${REPO}${path}`;
+
+function getToken(): string {
+  // read from state or localStorage (whatever the component currently uses)
+  const t = localStorage.getItem('gh_pat');
+  return t ?? '';
+}
+
+async function gh(path: string, init?: RequestInit) {
+  const res = await fetch(ghBase(path), {
+    ...init,
+    headers: {
+      Accept: 'application/vnd.github+json',
+      Authorization: `token ${getToken()}`,
+      ...(init?.headers ?? {}),
+    },
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`${res.status} ${res.statusText} – ${text}`);
+  }
+  return res.json();
+}
+
 interface BlogPostData {
   title: string;
   date: string;
@@ -38,7 +63,7 @@ const BlogImport = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [results, setResults] = useState<{ success: number; errors: string[] }>({ success: 0, errors: [] });
   const [showPreview, setShowPreview] = useState(false);
-  const [githubToken, setGithubToken] = useState('');
+  const [githubToken, setGithubToken] = useState(() => localStorage.getItem('gh_pat') || '');
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -96,42 +121,24 @@ ${post.content}
   };
 
   // Preflight checks
-  const checkRepoAccess = async (token: string): Promise<boolean> => {
+  const checkRepoAccess = async (): Promise<boolean> => {
     try {
-      const response = await fetch(`${GITHUB_API_BASE}/repos/${OWNER}/${REPO}`, {
-        headers: {
-          'Authorization': `token ${token}`,
-          'Accept': 'application/vnd.github.v3+json',
-        }
-      });
-      return response.ok;
+      await gh('');
+      return true;
     } catch (error) {
       return false;
     }
   };
 
-  const getMainBranchSha = async (token: string): Promise<string> => {
-    const response = await fetch(`${GITHUB_API_BASE}/repos/${OWNER}/${REPO}/git/ref/heads/main`, {
-      headers: {
-        'Authorization': `token ${token}`,
-        'Accept': 'application/vnd.github.v3+json',
-      }
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to get main branch SHA');
-    }
-    
-    const data = await response.json();
+  const getMainBranchSha = async (): Promise<string> => {
+    const data = await gh('/git/ref/heads/main');
     return data.object.sha;
   };
 
-  const createBranch = async (token: string, branchName: string, sha: string): Promise<void> => {
-    const response = await fetch(`${GITHUB_API_BASE}/repos/${OWNER}/${REPO}/git/refs`, {
+  const createBranch = async (branchName: string, sha: string): Promise<void> => {
+    await gh('/git/refs', {
       method: 'POST',
       headers: {
-        'Authorization': `token ${token}`,
-        'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -139,21 +146,14 @@ ${post.content}
         sha: sha
       })
     });
-
-    if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(`Failed to create branch: ${errorData}`);
-    }
   };
 
-  const commitMarkdownFile = async (token: string, branchName: string, slug: string, content: string, title: string): Promise<void> => {
+  const commitMarkdownFile = async (branchName: string, slug: string, content: string, title: string): Promise<void> => {
     const encodedContent = btoa(unescape(encodeURIComponent(content)));
     
-    const response = await fetch(`${GITHUB_API_BASE}/repos/${OWNER}/${REPO}/contents/content/blog/${slug}.md`, {
+    await gh(`/contents/content/blog/${slug}.md`, {
       method: 'PUT',
       headers: {
-        'Authorization': `token ${token}`,
-        'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -162,11 +162,6 @@ ${post.content}
         branch: branchName
       })
     });
-
-    if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(`Failed to commit file: ${errorData}`);
-    }
   };
 
   const createBlogPosts = async () => {
@@ -183,7 +178,7 @@ ${post.content}
       }
 
       // Preflight checks
-      const hasAccess = await checkRepoAccess(githubToken);
+      const hasAccess = await checkRepoAccess();
       if (!hasAccess) {
         errors.push('Cannot access repository. Check your GitHub token and repository settings.');
         setResults({ success: 0, errors });
@@ -191,7 +186,7 @@ ${post.content}
         return;
       }
 
-      const mainSha = await getMainBranchSha(githubToken);
+      const mainSha = await getMainBranchSha();
 
       for (let index = 0; index < csvData.length; index++) {
         const post = csvData[index];
@@ -206,10 +201,10 @@ ${post.content}
           const markdownContent = generateMarkdownContent(post);
           
           // Create branch for this post
-          await createBranch(githubToken, branchName, mainSha);
+          await createBranch(branchName, mainSha);
           
           // Commit the markdown file to the branch
-          await commitMarkdownFile(githubToken, branchName, slug, markdownContent, post.title);
+          await commitMarkdownFile(branchName, slug, markdownContent, post.title);
 
           successCount++;
           
@@ -356,7 +351,11 @@ ${post.content}
                     id="github-token"
                     type="password"
                     value={githubToken}
-                    onChange={(e) => setGithubToken(e.target.value)}
+                    onChange={(e) => {
+                      const token = e.target.value;
+                      setGithubToken(token);
+                      localStorage.setItem('gh_pat', token);
+                    }}
                     placeholder="ghp_..."
                     disabled={isProcessing}
                   />
