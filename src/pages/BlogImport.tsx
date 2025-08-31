@@ -214,42 +214,29 @@ ${post.content}
     }
   };
 
-  const getMainBranchSha = async (): Promise<string> => {
-    const data = await gh(`/git/refs/heads/${DEFAULT_BRANCH}`);
-    return data.object.sha;
-  };
+  // Remove getMainBranchSha and createBranch - Contents API handles branch creation
 
-  const createBranch = async (branchName: string, sha: string): Promise<void> => {
-    await gh('/git/refs', {
-      method: 'POST',
-      body: {
-        ref: `refs/heads/${branchName}`,
-        sha: sha
-      }
-    });
-  };
-
-  const commitMarkdownFile = async (branchName: string, slug: string, content: string, title: string): Promise<void> => {
-    const encodedContent = btoa(unescape(encodeURIComponent(content)));
+  const commitMarkdownFile = async (slug: string, content: string, title: string): Promise<void> => {
+    const contentBase64 = btoa(unescape(encodeURIComponent(content)));
     
+    // If the branch does not exist, GitHub will create it from the default branch.
     await gh(`/contents/content/blog/${slug}.md`, {
       method: 'PUT',
       body: {
-        message: `Create blog post: ${title}`,
-        content: encodedContent,
-        branch: branchName
+        message: `Create blog post "${title}"`,
+        content: contentBase64,
+        branch: `cms/blog/${slug}`
       }
     });
   };
 
-  const createPullRequest = async (branchName: string, title: string): Promise<number> => {
+  const createPullRequest = async (slug: string, title: string): Promise<number> => {
     const pr = await gh('/pulls', {
       method: 'POST',
       body: {
-        title: `Create blog post: ${title}`,
-        head: branchName,
+        title: `Update Blog Posts "${title}"`,
+        head: `cms/blog/${slug}`,
         base: DEFAULT_BRANCH,
-        body: 'Imported via bulk CSV'
       }
     });
     return pr.number;
@@ -286,7 +273,6 @@ ${post.content}
         return;
       }
 
-      const mainSha = await getMainBranchSha();
       const progressArray: PostProgress[] = [];
 
       for (let index = 0; index < csvData.length; index++) {
@@ -310,23 +296,17 @@ ${post.content}
           const uniqueSlug = await ensureUniqueSlug(baseSlug);
           progress.slug = uniqueSlug;
 
-          const branchName = `cms/blog/${uniqueSlug}`;
           const markdownContent = generateMarkdownContent(post);
           
-          // Create branch for this post
-          await createBranch(branchName, mainSha);
+          // Contents API will auto-create branch from default branch
+          await commitMarkdownFile(uniqueSlug, markdownContent, post.title);
           progress.branchCreated = true;
-          progressArray[index] = { ...progress };
-          setPostProgress([...progressArray]);
-          
-          // Commit the markdown file to the branch
-          await commitMarkdownFile(branchName, uniqueSlug, markdownContent, post.title);
           progress.fileCommitted = true;
           progressArray[index] = { ...progress };
           setPostProgress([...progressArray]);
 
           // Create pull request
-          const prNumber = await createPullRequest(branchName, post.title);
+          const prNumber = await createPullRequest(uniqueSlug, post.title);
           progress.prNumber = prNumber;
           progressArray[index] = { ...progress };
           setPostProgress([...progressArray]);
