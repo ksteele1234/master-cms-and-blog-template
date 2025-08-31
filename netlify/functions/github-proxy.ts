@@ -1,26 +1,40 @@
-import type { Handler } from '@netlify/functions';
+// netlify/functions/github-proxy.ts
+export const handler = async (event: any) => {
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, body: "Method Not Allowed" };
+  }
 
-export const handler: Handler = async (event) => {
   try {
-    const { path, method = 'GET', body, token } = JSON.parse(event.body ?? '{}');
+    const { url, method = "GET", headers = {}, body } = JSON.parse(event.body || "{}");
 
-    if (!token) return { statusCode: 401, body: 'Missing token' };
-    if (!path)  return { statusCode: 400, body: 'Missing path'  };
+    // Only allow GitHub API
+    if (!url || !url.startsWith("https://api.github.com/")) {
+      return { statusCode: 400, body: "Invalid or missing GitHub API url" };
+    }
 
-    const res = await fetch(`https://api.github.com/${path}`, {
+    // Compose headers (token can come from client or Netlify env)
+    const auth =
+      headers.Authorization ||
+      (process.env.GITHUB_TOKEN ? `Bearer ${process.env.GITHUB_TOKEN}` : undefined);
+
+    const res = await fetch(url, {
       method,
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28',
-        'Content-Type': 'application/json',
+        "content-type": "application/json",
+        "user-agent": "netlify-github-proxy",
+        ...(auth ? { Authorization: auth } : {}),
       },
       body: body ? JSON.stringify(body) : undefined,
     });
 
     const text = await res.text();
-    return { statusCode: res.status, body: text };
+    // Pass through status & content-type
+    return {
+      statusCode: res.status,
+      headers: { "content-type": res.headers.get("content-type") || "application/json" },
+      body: text,
+    };
   } catch (err: any) {
-    return { statusCode: 500, body: err?.message ?? 'Proxy error' };
+    return { statusCode: 500, body: `github-proxy error: ${err?.message || err}` };
   }
 };
