@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { useBlogPosts } from '../hooks/useBlogPosts';
 import { useSitemapUpdater } from '../hooks/useSitemapUpdater';
+import { useRSSUpdater } from '../hooks/useRSSUpdater';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,14 @@ const Blog = () => {
   console.log('🚀 Blog component rendering...');
   const { posts, loading } = useBlogPosts();
   const { manualUpdate: updateSitemap, getLastUpdated } = useSitemapUpdater();
+  const { updateRSSFeed } = useRSSUpdater();
+
+  // Auto-update RSS feed when posts change
+  React.useEffect(() => {
+    if (!loading && posts.length > 0) {
+      updateRSSFeed(posts);
+    }
+  }, [posts, loading, updateRSSFeed]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [sortBy, setSortBy] = useState<string>("date-desc");
   const [featuredFilter, setFeaturedFilter] = useState<string>("all");
