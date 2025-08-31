@@ -16,29 +16,26 @@ const GH_OWNER = import.meta.env.VITE_GH_OWNER ?? 'ksteele1234';
 const GH_REPO = import.meta.env.VITE_GH_REPO ?? 'hx-cpas-connect';
 const DEFAULT_BRANCH = 'main';
 
-const ghBase = (path: string) =>
-  `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}${path}`;
+async function gh(path: string, init: RequestInit = {}) {
+  const payload = {
+    path: `repos/${GH_OWNER}/${GH_REPO}${path.startsWith('/') ? path : '/' + path}`,
+    method: init.method ?? 'GET',
+    body: init.body ? JSON.parse(init.body as string) : undefined,
+    token: getToken(),
+  };
+  const r = await fetch('/.netlify/functions/github-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
 
 function getToken(): string {
   // read from state or localStorage (whatever the component currently uses)
   const t = localStorage.getItem('hrx_blog_import_gh_token');
   return t ?? '';
-}
-
-async function gh(path: string, init?: RequestInit) {
-  const res = await fetch(ghBase(path), {
-    ...init,
-    headers: {
-      Accept: 'application/vnd.github+json',
-      Authorization: `token ${getToken()}`,
-      ...(init?.headers ?? {}),
-    },
-  });
-  if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(`${res.status} ${res.statusText} – ${text}`);
-  }
-  return res.json();
 }
 
 interface BlogPostData {
