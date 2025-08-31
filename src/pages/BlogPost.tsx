@@ -10,6 +10,9 @@ import { Calendar, User, Clock, ArrowLeft, Share2, BookOpen } from "lucide-react
 import BlogBreadcrumbs from '../components/BlogBreadcrumbs';
 import OptimizedImage from '../components/OptimizedImage';
 import RelatedPosts from '../components/RelatedPosts';
+import IntelligentRelatedPosts from '../components/IntelligentRelatedPosts';
+import StructuredData from '../components/StructuredData';
+import { generateBlogPostSchema } from '../utils/structuredData';
 import { useBlogPosts } from '../hooks/useBlogPosts';
 import type { BlogPost } from '../hooks/useBlogPosts';
 import Header from '../components/Header';
@@ -85,36 +88,40 @@ const BlogPost = () => {
           <meta key={tag} property="article:tag" content={tag} />
         ))}
         <link rel="canonical" href={`https://hrxcpas.com/blog/${post.slug}`} />
-        
-        {/* JSON-LD Structured Data */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BlogPosting",
-            "headline": post.title,
-            "description": post.excerpt,
-            "image": post.featuredImage,
-            "author": {
-              "@type": "Organization",
-              "name": post.author
-            },
-            "publisher": {
-              "@type": "Organization",
-              "name": "HRX CPAs",
-              "logo": {
-                "@type": "ImageObject",
-                "url": "https://hrxcpas.com/assets/hrx-logo.png"
-              }
-            },
-            "datePublished": post.date,
-            "dateModified": post.date,
-            "mainEntityOfPage": {
-              "@type": "WebPage",
-              "@id": `https://hrxcpas.com/blog/${post.slug}`
-            }
-          })}
-        </script>
       </Helmet>
+
+      {/* Structured Data */}
+      <StructuredData 
+        schema={generateBlogPostSchema(post)}
+        id="blog-post-schema"
+      />
+      
+      <StructuredData 
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://hrxcpas.com/"
+            },
+            {
+              "@type": "ListItem", 
+              "position": 2,
+              "name": "Blog",
+              "item": "https://hrxcpas.com/blog"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": post.title
+            }
+          ]
+        }}
+        id="breadcrumb-schema"
+      />
 
       <Header />
       
@@ -280,8 +287,8 @@ const BlogPost = () => {
           </div>
         </div>
 
-        {/* Related Posts */}
-        <RelatedPosts currentPost={post} allPosts={posts} />
+        {/* Intelligent Related Posts with Internal Linking */}
+        <IntelligentRelatedPosts currentPost={post} allPosts={posts} />
       </article>
       
       <Footer />
