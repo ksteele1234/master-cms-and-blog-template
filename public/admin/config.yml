@@ -1,6 +1,7 @@
 backend:
   name: git-gateway
   branch: main
+publish_mode: simple   # TEMP to clear label migration
 
 # Local development support
 local_backend: true
@@ -12,9 +13,6 @@ display_url: https://hrx-cpas.netlify.app
 # Authentication requirements
 auth_scope: repo
 auth_type: implicit
-
-# Enable editorial workflow for draft/review/publish states
-publish_mode: editorial_workflow
 
 # Media storage
 media_folder: "public/images/blog"
