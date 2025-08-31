@@ -201,7 +201,7 @@ const BlogPost = () => {
                 h2: ({children}) => {
                   const text = typeof children === 'string' ? children : children?.toString() || '';
                   const id = text.toLowerCase().replace(/[^a-z0-9\s]+/g, '').replace(/\s+/g, '-');
-                  return <h2 id={id} className="text-2xl font-bold mt-6 mb-3">{children}</h2>;
+                  return <h2 id={id} className="text-2xl font-bold mt-8 mb-4 scroll-mt-8">{children}</h2>;
                 },
                 h3: ({children}) => <h3 className="text-xl font-semibold mt-4 mb-2">{children}</h3>,
                 p: ({children}) => <p className="mb-4 leading-relaxed">{children}</p>,
