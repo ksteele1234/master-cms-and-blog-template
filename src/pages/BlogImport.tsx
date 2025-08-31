@@ -13,8 +13,8 @@ import Footer from '../components/Footer';
 
 // GitHub API configuration
 const GITHUB_API_BASE = 'https://api.github.com';
-const REPO_OWNER = 'YOUR_GITHUB_USERNAME'; // Replace with your GitHub username
-const REPO_NAME = 'YOUR_REPO_NAME'; // Replace with your repo name
+const OWNER = import.meta.env.VITE_GH_OWNER!;
+const REPO = import.meta.env.VITE_GH_REPO!;
 
 interface BlogPostData {
   title: string;
@@ -98,7 +98,7 @@ ${post.content}
   // Preflight checks
   const checkRepoAccess = async (token: string): Promise<boolean> => {
     try {
-      const response = await fetch(`${GITHUB_API_BASE}/repos/${REPO_OWNER}/${REPO_NAME}`, {
+      const response = await fetch(`${GITHUB_API_BASE}/repos/${OWNER}/${REPO}`, {
         headers: {
           'Authorization': `token ${token}`,
           'Accept': 'application/vnd.github.v3+json',
@@ -111,7 +111,7 @@ ${post.content}
   };
 
   const getMainBranchSha = async (token: string): Promise<string> => {
-    const response = await fetch(`${GITHUB_API_BASE}/repos/${REPO_OWNER}/${REPO_NAME}/git/ref/heads/main`, {
+    const response = await fetch(`${GITHUB_API_BASE}/repos/${OWNER}/${REPO}/git/ref/heads/main`, {
       headers: {
         'Authorization': `token ${token}`,
         'Accept': 'application/vnd.github.v3+json',
@@ -127,7 +127,7 @@ ${post.content}
   };
 
   const createBranch = async (token: string, branchName: string, sha: string): Promise<void> => {
-    const response = await fetch(`${GITHUB_API_BASE}/repos/${REPO_OWNER}/${REPO_NAME}/git/refs`, {
+    const response = await fetch(`${GITHUB_API_BASE}/repos/${OWNER}/${REPO}/git/refs`, {
       method: 'POST',
       headers: {
         'Authorization': `token ${token}`,
@@ -149,7 +149,7 @@ ${post.content}
   const commitMarkdownFile = async (token: string, branchName: string, slug: string, content: string, title: string): Promise<void> => {
     const encodedContent = btoa(unescape(encodeURIComponent(content)));
     
-    const response = await fetch(`${GITHUB_API_BASE}/repos/${REPO_OWNER}/${REPO_NAME}/contents/content/blog/${slug}.md`, {
+    const response = await fetch(`${GITHUB_API_BASE}/repos/${OWNER}/${REPO}/contents/content/blog/${slug}.md`, {
       method: 'PUT',
       headers: {
         'Authorization': `token ${token}`,
@@ -366,7 +366,7 @@ ${post.content}
                   <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                     GitHub Settings
                   </a>{' '}
-                  with repository scope for {REPO_OWNER}/{REPO_NAME}
+                  with repository scope for {OWNER}/{REPO}
                 </p>
               </div>
             </div>
