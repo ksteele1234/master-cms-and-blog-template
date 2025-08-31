@@ -17,17 +17,22 @@ const GH_REPO = import.meta.env.VITE_GH_REPO ?? 'hx-cpas-connect';
 const DEFAULT_BRANCH = 'main';
 
 async function gh(path: string, init: RequestInit = {}) {
+  const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}${path.startsWith('/') ? path : '/' + path}`;
+  const token = getToken();
+  
   const payload = {
-    path: `repos/${GH_OWNER}/${GH_REPO}${path.startsWith('/') ? path : '/' + path}`,
+    url,
     method: init.method ?? 'GET',
+    headers: { Authorization: `Bearer ${token}` },
     body: init.body ? JSON.parse(init.body as string) : undefined,
-    token: getToken(),
   };
+  
   const r = await fetch('/.netlify/functions/github-proxy', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'content-type': 'application/json' },
     body: JSON.stringify(payload),
   });
+  
   if (!r.ok) throw new Error(await r.text());
   return r.json();
 }
