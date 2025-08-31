@@ -121,7 +121,7 @@ const BlogImport = () => {
 
   const validateCsvData = (data: BlogPostData[]): string[] => {
     const errors: string[] = [];
-    const requiredColumns = ['title', 'date', 'category', 'author', 'excerpt', 'featuredImage', 'imageAlt', 'content'];
+    const requiredColumns = ['title', 'date', 'category', 'author', 'excerpt', 'content'];
     
     data.forEach((row, index) => {
       const rowNum = index + 1;
@@ -133,8 +133,8 @@ const BlogImport = () => {
         }
       });
       
-      // Validate featuredImage path
-      if (row.featuredImage && !row.featuredImage.startsWith('public/images/blog/')) {
+      // Validate featuredImage path (only if provided)
+      if (row.featuredImage && row.featuredImage.trim() !== '' && !row.featuredImage.startsWith('public/images/blog/')) {
         errors.push(`Row ${rowNum}: featuredImage must start with 'public/images/blog/' (got: ${row.featuredImage})`);
       }
       
@@ -358,8 +358,8 @@ ${post.content}
         author: "Hiram Parmar, CPA",
         category: "Tax Planning",
         excerpt: "This is a sample excerpt that describes what the blog post is about.",
-        featuredImage: "public/images/blog/sample-image.jpg",
-        imageAlt: "Sample image description for accessibility",
+        featuredImage: "",
+        imageAlt: "",
         seoTitle: "Sample SEO Title | HRX CPAs",
         metaDescription: "Sample meta description for SEO purposes",
         tags: "tax planning, business, finance",
@@ -417,8 +417,6 @@ ${post.content}
                 <li><strong>category</strong> - Post category</li>
                 <li><strong>author</strong> - Author name</li>
                 <li><strong>excerpt</strong> - Brief description</li>
-                <li><strong>featuredImage</strong> - Image path starting with public/images/blog/</li>
-                <li><strong>imageAlt</strong> - Image alt text for accessibility</li>
                 <li><strong>content</strong> - Full blog post content (markdown supported)</li>
               </ul>
               <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded text-xs">
@@ -429,6 +427,8 @@ ${post.content}
             <div>
               <h3 className="font-semibold mb-2">Optional Columns:</h3>
               <ul className="list-disc pl-6 space-y-1 text-sm">
+                <li><strong>featuredImage</strong> - Image path starting with public/images/blog/</li>
+                <li><strong>imageAlt</strong> - Image alt text for accessibility</li>
                 <li><strong>seoTitle</strong> - Custom SEO title</li>
                 <li><strong>metaDescription</strong> - Meta description</li>
                 <li><strong>tags</strong> - Comma-separated tags</li>
