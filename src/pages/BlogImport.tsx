@@ -163,6 +163,34 @@ ${post.content}
     });
   };
 
+  const createPullRequest = async (branchName: string, title: string): Promise<number> => {
+    const pr = await gh('/pulls', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: `Create blog post: ${title}`,
+        head: branchName,
+        base: 'main',
+        body: 'Imported via bulk CSV'
+      })
+    });
+    return pr.number;
+  };
+
+  const addDecapLabel = async (prNumber: number): Promise<void> => {
+    await gh(`/issues/${prNumber}/labels`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        labels: ['decap-cms/pending_publish'] 
+      })
+    });
+  };
+
   const createBlogPosts = async () => {
     const errors: string[] = [];
     let successCount = 0;
@@ -204,6 +232,12 @@ ${post.content}
           
           // Commit the markdown file to the branch
           await commitMarkdownFile(branchName, slug, markdownContent, post.title);
+
+          // Create pull request
+          const prNumber = await createPullRequest(branchName, post.title);
+          
+          // Add Decap CMS label
+          await addDecapLabel(prNumber);
 
           successCount++;
           
