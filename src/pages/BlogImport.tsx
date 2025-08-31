@@ -12,11 +12,12 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 // GitHub API configuration
-const OWNER = import.meta.env.VITE_GH_OWNER!;
-const REPO = import.meta.env.VITE_GH_REPO!;
+const GH_OWNER = import.meta.env.VITE_GH_OWNER ?? 'ksteele1234';
+const GH_REPO = import.meta.env.VITE_GH_REPO ?? 'hx-cpas-connect';
+const DEFAULT_BRANCH = 'main';
 
 const ghBase = (path: string) =>
-  `https://api.github.com/repos/${OWNER}/${REPO}${path}`;
+  `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}${path}`;
 
 function getToken(): string {
   // read from state or localStorage (whatever the component currently uses)
@@ -398,7 +399,7 @@ ${post.content}
                   <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                     GitHub Settings
                   </a>{' '}
-                  with repository scope for {OWNER}/{REPO}
+                  with repository scope for {GH_OWNER}/{GH_REPO}
                 </p>
               </div>
             </div>
