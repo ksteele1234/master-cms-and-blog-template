@@ -12,45 +12,37 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 // GitHub API configuration
-const owner = 'ksteele1234';
-const repo = 'hx-cpas-connect';
-const proxyUrl = '/.netlify/functions/github-proxy';
+const OWNER = 'ksteele1234';
+const REPO = 'hx-cpas-connect';
+const DEFAULT_BRANCH = 'main';
 
-/** Always call GitHub through the Netlify proxy, with Authorization */
-async function gh<T = any>(path: string, init: RequestInit & { body?: any } = {}) {
-  // however you store the token (input, localStorage, etc.)
-  const token = getToken()?.trim() || '';
+// helper – one place for all GitHub calls
+async function gh(
+  path: string,
+  init: { method?: string; body?: any; headers?: Record<string, string> } = {}
+) {
+  const localToken = localStorage.getItem('gh_token') || undefined; // if you allow pasting a token in the UI
 
-  const url = path.startsWith('http')
-    ? path
-    : `https://api.github.com/repos/${owner}/${repo}/${path.replace(/^\/+/, '')}`;
-
-  const headers: Record<string, string> = {
-    'content-type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...(init.headers as Record<string, string> || {}),
-  };
-
-  const res = await fetch(proxyUrl, {
+  const res = await fetch('/.netlify/functions/github-proxy', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
-      url,
-      method: init.method || 'GET',
-      headers,
-      body: init.body ?? undefined,
-    }),
+      url: `https://api.github.com/repos/${OWNER}/${REPO}${path}`,
+      method: init.method ?? 'GET',
+      headers: {
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        ...(localToken ? { Authorization: `Bearer ${localToken}` } : {})
+      },
+      body: init.body ?? undefined
+    })
   });
 
-  const text = await res.text();
-  const isJSON = (res.headers.get('content-type') || '').includes('application/json');
-  const data = isJSON && text ? JSON.parse(text) : text;
-
   if (!res.ok) {
-    console.error('GitHub error', res.status, data);
-    throw new Error(data?.message || `GitHub error ${res.status}`);
+    const txt = await res.text();
+    throw new Error(`GitHub ${res.status}: ${txt}`);
   }
-  return data as T;
+  return res.json();
 }
 
 function getToken(): string {
@@ -517,7 +509,7 @@ ${post.content}
                   <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                     GitHub Settings
                   </a>{' '}
-                  with repository scope for {owner}/{repo}
+                  with repository scope for {OWNER}/{REPO}
                 </p>
                 {githubToken && (
                   <Button 
