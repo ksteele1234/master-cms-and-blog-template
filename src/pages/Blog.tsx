@@ -6,7 +6,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, User, ArrowRight, Clock, Filter, BookOpen, TrendingUp, Shield, Calculator, ChevronDown } from "lucide-react";
+import { Calendar, User, ArrowRight, Clock, Filter, BookOpen, TrendingUp, Shield, Calculator, ChevronDown, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
@@ -16,12 +17,14 @@ const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [sortBy, setSortBy] = useState<string>("date-desc");
   const [featuredFilter, setFeaturedFilter] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   console.log('📝 Blog component state:', { 
     postsCount: posts.length, 
     loading, 
     selectedCategory, 
-    featuredFilter 
+    featuredFilter,
+    searchTerm 
   });
 
   const categories = ["All", "Tax Planning", "Tax Credits", "Estate Planning", "Tax Law Updates", "Executive Compensation", "Small Business"];
@@ -44,7 +47,18 @@ const Blog = () => {
 
   console.log('=== FILTERING DEBUG ===');
   console.log('Total posts:', posts.length);
-  console.log('Selected filters:', { selectedCategory, featuredFilter });
+  console.log('Selected filters:', { selectedCategory, featuredFilter, searchTerm });
+
+  // Search filter
+  if (searchTerm.trim()) {
+    console.log('Filtering by search term:', searchTerm);
+    filteredPosts = filteredPosts.filter(post => 
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.category.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    console.log('After search filter:', filteredPosts.length);
+  }
 
   // Category filter
   if (selectedCategory !== "All") {
@@ -54,7 +68,6 @@ const Blog = () => {
     console.log('After category filter:', filteredPosts.length);
     console.log('Posts matching category:', filteredPosts.map(p => ({ title: p.title, category: p.category })));
   }
-
 
   // Featured filter
   if (featuredFilter !== "all") {
@@ -118,6 +131,18 @@ const Blog = () => {
 
         {/* Filter and Sort Controls */}
         <div className="mb-8 space-y-6">
+          {/* Search Bar */}
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              type="text"
+              placeholder="Search posts..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600"
+            />
+          </div>
+
           {/* Filter Controls Row */}
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center">
@@ -181,8 +206,8 @@ const Blog = () => {
           {/* Results Counter */}
           <div className="text-sm text-gray-600">
             Showing {sortedPosts.length} of {posts.length} posts
+            {searchTerm && ` matching "${searchTerm}"`}
             {selectedCategory !== "All" && ` in "${selectedCategory}"`}
-            
             {featuredFilter !== "all" && ` (${featuredOptions.find(o => o.value === featuredFilter)?.label})`}
           </div>
         </div>
@@ -273,7 +298,9 @@ const Blog = () => {
 
         {sortedPosts.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500">No posts found in this category.</p>
+            <p className="text-gray-500">
+              {searchTerm ? `No posts found matching "${searchTerm}".` : "No posts found with the selected filters."}
+            </p>
           </div>
         )}
       </div>
