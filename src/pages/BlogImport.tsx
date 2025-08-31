@@ -11,17 +11,10 @@ import { Download, Upload, FileText, AlertCircle, CheckCircle } from "lucide-rea
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
-// Extend the global window interface for Netlify Identity
-declare global {
-  interface Window {
-    netlifyIdentity?: {
-      on: (event: string, callback: (user?: any) => void) => void;
-      init: () => void;
-      currentUser: () => any;
-      open: () => void;
-    };
-  }
-}
+// GitHub API configuration
+const GITHUB_API_BASE = 'https://api.github.com';
+const REPO_OWNER = 'YOUR_GITHUB_USERNAME'; // Replace with your GitHub username
+const REPO_NAME = 'YOUR_REPO_NAME'; // Replace with your repo name
 
 interface BlogPostData {
   title: string;
@@ -45,6 +38,7 @@ const BlogImport = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [results, setResults] = useState<{ success: number; errors: string[] }>({ success: 0, errors: [] });
   const [showPreview, setShowPreview] = useState(false);
+  const [githubToken, setGithubToken] = useState('');
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -101,29 +95,103 @@ ${post.content}
 `;
   };
 
+  // Preflight checks
+  const checkRepoAccess = async (token: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${GITHUB_API_BASE}/repos/${REPO_OWNER}/${REPO_NAME}`, {
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+        }
+      });
+      return response.ok;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const getMainBranchSha = async (token: string): Promise<string> => {
+    const response = await fetch(`${GITHUB_API_BASE}/repos/${REPO_OWNER}/${REPO_NAME}/git/ref/heads/main`, {
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to get main branch SHA');
+    }
+    
+    const data = await response.json();
+    return data.object.sha;
+  };
+
+  const createBranch = async (token: string, branchName: string, sha: string): Promise<void> => {
+    const response = await fetch(`${GITHUB_API_BASE}/repos/${REPO_OWNER}/${REPO_NAME}/git/refs`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ref: `refs/heads/${branchName}`,
+        sha: sha
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      throw new Error(`Failed to create branch: ${errorData}`);
+    }
+  };
+
+  const commitMarkdownFile = async (token: string, branchName: string, slug: string, content: string, title: string): Promise<void> => {
+    const encodedContent = btoa(unescape(encodeURIComponent(content)));
+    
+    const response = await fetch(`${GITHUB_API_BASE}/repos/${REPO_OWNER}/${REPO_NAME}/contents/content/blog/${slug}.md`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: `Create blog post ${title}`,
+        content: encodedContent,
+        branch: branchName
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      throw new Error(`Failed to commit file: ${errorData}`);
+    }
+  };
+
   const createBlogPosts = async () => {
     const errors: string[] = [];
     let successCount = 0;
     setIsProcessing(true);
 
     try {
-      // Check if user is authenticated with Netlify Identity
-      if (!window.netlifyIdentity || !window.netlifyIdentity.currentUser()) {
-        errors.push('You must be logged in to create blog posts');
+      if (!githubToken) {
+        errors.push('GitHub token is required');
         setResults({ success: 0, errors });
         setIsProcessing(false);
         return;
       }
 
-      const user = window.netlifyIdentity.currentUser();
-      const token = user.token?.access_token;
-      
-      if (!token) {
-        errors.push('Authentication token not available');
+      // Preflight checks
+      const hasAccess = await checkRepoAccess(githubToken);
+      if (!hasAccess) {
+        errors.push('Cannot access repository. Check your GitHub token and repository settings.');
         setResults({ success: 0, errors });
         setIsProcessing(false);
         return;
       }
+
+      const mainSha = await getMainBranchSha(githubToken);
 
       for (let index = 0; index < csvData.length; index++) {
         const post = csvData[index];
@@ -134,38 +202,19 @@ ${post.content}
           }
 
           const slug = generateSlug(post.title, post.date);
+          const branchName = `cms/blog/${slug}`;
           const markdownContent = generateMarkdownContent(post);
           
-          // Create entry through Decap CMS API with proper editorial workflow format
-          const response = await fetch('/.netlify/git/github/entries/blog', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              slug: slug,
-              raw: markdownContent,
-              path: `content/blog/${slug}.md`,
-              partial: false,
-              author: {
-                login: user.user_metadata?.full_name || user.email,
-                name: user.user_metadata?.full_name || user.email,
-                email: user.email
-              }
-            })
-          });
-
-          if (!response.ok) {
-            const errorData = await response.text();
-            errors.push(`Row ${index + 1}: Failed to create editorial workflow entry - ${errorData}`);
-            continue;
-          }
+          // Create branch for this post
+          await createBranch(githubToken, branchName, mainSha);
+          
+          // Commit the markdown file to the branch
+          await commitMarkdownFile(githubToken, branchName, slug, markdownContent, post.title);
 
           successCount++;
           
           // Small delay between API calls
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
           errors.push(`Row ${index + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
@@ -178,37 +227,6 @@ ${post.content}
     setIsProcessing(false);
   };
 
-  const getLatestCommitSha = async (token: string): Promise<string> => {
-    const response = await fetch('/.netlify/git/github/git/refs/heads/main', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      }
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to get latest commit SHA');
-    }
-    
-    const data = await response.json();
-    return data.object.sha;
-  };
-
-  const getGitHubToken = async (): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      if (window.netlifyIdentity && window.netlifyIdentity.currentUser()) {
-        const user = window.netlifyIdentity.currentUser();
-        const token = user.token?.access_token;
-        if (token) {
-          resolve(token);
-        } else {
-          reject(new Error('No access token available'));
-        }
-      } else {
-        reject(new Error('User not authenticated'));
-      }
-    });
-  };
 
   const downloadSampleCSV = () => {
     const sampleData = [
@@ -321,6 +339,40 @@ ${post.content}
           </CardContent>
         </Card>
 
+        {/* GitHub Token Section */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>GitHub Configuration</CardTitle>
+            <CardDescription>
+              Enter your GitHub fine-grained personal access token
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="github-token" className="text-base font-medium">GitHub Token</Label>
+                <div className="mt-2">
+                  <Input
+                    id="github-token"
+                    type="password"
+                    value={githubToken}
+                    onChange={(e) => setGithubToken(e.target.value)}
+                    placeholder="ghp_..."
+                    disabled={isProcessing}
+                  />
+                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  Create a fine-grained token at{' '}
+                  <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    GitHub Settings
+                  </a>{' '}
+                  with repository scope for {REPO_OWNER}/{REPO_NAME}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Upload Section */}
         <Card className="mb-6">
           <CardHeader>
@@ -384,10 +436,10 @@ ${post.content}
                 <Button 
                   onClick={createBlogPosts} 
                   className="w-full"
-                  disabled={isProcessing}
+                  disabled={isProcessing || !githubToken}
                 >
                   <Upload className="w-4 h-4 mr-2" />
-                  {isProcessing ? 'Creating Posts...' : 'Create Blog Posts in CMS'}
+                  {isProcessing ? 'Creating Posts...' : 'Create Blog Posts'}
                 </Button>
               </div>
             </CardContent>
@@ -405,7 +457,7 @@ ${post.content}
                 <Alert className="border-green-200 bg-green-50">
                   <CheckCircle className="h-4 w-4 text-green-600" />
                   <AlertDescription className="text-green-800">
-                    Successfully created {results.success} blog posts in the CMS
+                    Successfully created {results.success} blog posts as branches in GitHub
                   </AlertDescription>
                 </Alert>
               )}
@@ -425,13 +477,13 @@ ${post.content}
                  <div className="text-sm text-gray-600">
                 <p><strong>Next steps:</strong></p>
                 <ol className="list-decimal pl-4 mt-2 space-y-1">
-                  <li><strong>Review Drafts:</strong> Go to <a href="/admin/#/workflow" className="text-blue-600 hover:underline">/admin/#/workflow</a> to see your imported posts in the "Draft" column</li>
+                  <li><strong>Review Branches:</strong> Check your GitHub repository for new branches prefixed with <code className="bg-gray-100 px-1 rounded">cms/blog/</code></li>
                   <li><strong>Upload Images:</strong> Make sure all referenced images are uploaded to the <code className="bg-gray-100 px-1 rounded">public/images/blog/</code> directory</li>
-                  <li><strong>Move to Review:</strong> Drag posts from "Draft" to "In Review" when ready for approval</li>
-                  <li><strong>Publish:</strong> Move posts from "Ready" to "Published" to make them live on the website</li>
+                  <li><strong>Create Pull Requests:</strong> Create pull requests from the blog branches to main for review</li>
+                  <li><strong>Merge:</strong> Merge the pull requests to publish the blog posts</li>
                 </ol>
                 <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
-                  <p className="text-blue-800 text-xs"><strong>Success!</strong> Your blog posts have been created as drafts in the editorial workflow. They will not appear on the website until published.</p>
+                  <p className="text-blue-800 text-xs"><strong>Success!</strong> Your blog posts have been created as separate branches in GitHub. Create pull requests to merge them.</p>
                 </div>
               </div>
             </CardContent>
