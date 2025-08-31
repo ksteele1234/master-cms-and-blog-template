@@ -21,7 +21,7 @@ const ghBase = (path: string) =>
 
 function getToken(): string {
   // read from state or localStorage (whatever the component currently uses)
-  const t = localStorage.getItem('gh_pat');
+  const t = localStorage.getItem('hrx_blog_import_gh_token');
   return t ?? '';
 }
 
@@ -63,7 +63,12 @@ const BlogImport = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [results, setResults] = useState<{ success: number; errors: string[] }>({ success: 0, errors: [] });
   const [showPreview, setShowPreview] = useState(false);
-  const [githubToken, setGithubToken] = useState(() => localStorage.getItem('gh_pat') || '');
+  const [githubToken, setGithubToken] = useState(() => localStorage.getItem('hrx_blog_import_gh_token') || '');
+
+  const forgetToken = () => {
+    localStorage.removeItem('hrx_blog_import_gh_token');
+    setGithubToken('');
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -388,7 +393,7 @@ ${post.content}
                     onChange={(e) => {
                       const token = e.target.value;
                       setGithubToken(token);
-                      localStorage.setItem('gh_pat', token);
+                      localStorage.setItem('hrx_blog_import_gh_token', token);
                     }}
                     placeholder="ghp_..."
                     disabled={isProcessing}
@@ -401,6 +406,17 @@ ${post.content}
                   </a>{' '}
                   with repository scope for {GH_OWNER}/{GH_REPO}
                 </p>
+                {githubToken && (
+                  <Button 
+                    onClick={forgetToken}
+                    variant="outline" 
+                    size="sm"
+                    className="mt-2"
+                    disabled={isProcessing}
+                  >
+                    Forget Token
+                  </Button>
+                )}
               </div>
             </div>
           </CardContent>
