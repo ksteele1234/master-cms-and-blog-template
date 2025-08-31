@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { useBlogPosts } from '../hooks/useBlogPosts';
+import { useSitemapUpdater } from '../hooks/useSitemapUpdater';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ import OptimizedImage from '../components/OptimizedImage';
 const Blog = () => {
   console.log('🚀 Blog component rendering...');
   const { posts, loading } = useBlogPosts();
+  const { manualUpdate: updateSitemap, getLastUpdated } = useSitemapUpdater();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [sortBy, setSortBy] = useState<string>("date-desc");
   const [featuredFilter, setFeaturedFilter] = useState<string>("all");
