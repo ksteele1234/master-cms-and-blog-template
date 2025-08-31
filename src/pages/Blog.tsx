@@ -110,10 +110,52 @@ const Blog = () => {
   return (
     <>
       <Helmet>
-        <title>Tax & Business Blog | Expert CPA Insights | HRX CPAs</title>
-        <meta name="description" content="Expert tax planning, business strategy, and financial insights from HRX CPAs. Stay updated with the latest tax law changes and business growth strategies." />
-        <meta name="keywords" content="tax planning, business strategy, CPA insights, tax law updates, financial planning" />
-        <link rel="canonical" href="https://yoursite.com/blog" />
+        <title>Tax & Business Strategy Blog | Expert CPA Insights | HRX CPAs</title>
+        <meta name="description" content="Expert tax planning, business strategy, and financial insights from certified CPAs. Stay updated with the latest tax law changes, estate planning tips, and business guidance." />
+        <meta name="keywords" content="tax planning blog, CPA insights, business strategy, tax law changes, estate planning, RSU planning, business accounting" />
+        <link rel="canonical" href="https://hrxcpas.com/blog" />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content="Tax & Business Strategy Blog | HRX CPAs" />
+        <meta property="og:description" content="Expert tax planning, business strategy, and financial insights from certified CPAs." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://hrxcpas.com/blog" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Tax & Business Strategy Blog | HRX CPAs" />
+        <meta name="twitter:description" content="Expert tax planning, business strategy, and financial insights from certified CPAs." />
+        
+        {/* JSON-LD for Blog */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            "name": "HRX CPAs Tax & Business Blog",
+            "description": "Expert tax planning, business strategy, and financial insights from certified CPAs",
+            "url": "https://hrxcpas.com/blog",
+            "publisher": {
+              "@type": "Organization",
+              "name": "HRX CPAs",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://hrxcpas.com/assets/hrx-logo.png"
+              }
+            },
+            "blogPost": sortedPosts.slice(0, 10).map(post => ({
+              "@type": "BlogPosting",
+              "headline": post.title,
+              "description": post.excerpt,
+              "url": `https://hrxcpas.com/blog/${post.slug}`,
+              "datePublished": post.date,
+              "author": {
+                "@type": "Organization", 
+                "name": post.author
+              },
+              "image": post.featuredImage
+            }))
+          })}
+        </script>
       </Helmet>
 
       <Header />

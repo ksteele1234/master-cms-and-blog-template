@@ -7,6 +7,8 @@ import rehypeRaw from 'rehype-raw';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, User, Clock, ArrowLeft, Share2, BookOpen } from "lucide-react";
+import BlogBreadcrumbs from '../components/BlogBreadcrumbs';
+import RelatedPosts from '../components/RelatedPosts';
 import { useBlogPosts } from '../hooks/useBlogPosts';
 import type { BlogPost } from '../hooks/useBlogPosts';
 import Header from '../components/Header';
@@ -81,7 +83,7 @@ const BlogPost = () => {
         {post.tags && post.tags.map(tag => (
           <meta key={tag} property="article:tag" content={tag} />
         ))}
-        <link rel="canonical" href={`https://yoursite.com/blog/${post.slug}`} />
+        <link rel="canonical" href={`https://hrxcpas.com/blog/${post.slug}`} />
         
         {/* JSON-LD Structured Data */}
         <script type="application/ld+json">
@@ -100,14 +102,14 @@ const BlogPost = () => {
               "name": "HRX CPAs",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://yoursite.com/logo.png"
+                "url": "https://hrxcpas.com/assets/hrx-logo.png"
               }
             },
             "datePublished": post.date,
             "dateModified": post.date,
             "mainEntityOfPage": {
               "@type": "WebPage",
-              "@id": `https://yoursite.com/blog/${post.slug}`
+              "@id": `https://hrxcpas.com/blog/${post.slug}`
             }
           })}
         </script>
@@ -116,15 +118,13 @@ const BlogPost = () => {
       <Header />
       
       <article className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Back to Blog */}
-        <div className="mb-6">
-          <Link to="/blog">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Blog
-            </Button>
-          </Link>
-        </div>
+        {/* Breadcrumbs */}
+        <BlogBreadcrumbs 
+          items={[
+            { label: 'Blog', href: '/blog' },
+            { label: post.title }
+          ]} 
+        />
 
         {/* Article Header */}
         <header className="mb-8">
@@ -162,6 +162,34 @@ const BlogPost = () => {
           />
         </header>
 
+        {/* Table of Contents */}
+        {post.content && post.content.includes('##') && (
+          <aside className="bg-muted/50 border border-border rounded-lg p-6 mb-8">
+            <h2 className="text-lg font-semibold mb-4 flex items-center">
+              <BookOpen className="w-5 h-5 mr-2" />
+              Table of Contents
+            </h2>
+            <nav className="space-y-2 text-sm">
+              {post.content
+                .split('\n')
+                .filter(line => line.startsWith('##'))
+                .map((heading, index) => {
+                  const text = heading.replace(/^##\s*/, '');
+                  const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                  return (
+                    <a 
+                      key={index}
+                      href={`#${id}`}
+                      className="block text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {text}
+                    </a>
+                  );
+                })}
+            </nav>
+          </aside>
+        )}
+
         {/* Article Content */}
         <div className="prose prose-lg max-w-none">
           {post.content ? (
@@ -170,7 +198,11 @@ const BlogPost = () => {
               rehypePlugins={[rehypeRaw]}
               components={{
                 h1: ({children}) => <h2 className="text-2xl font-bold mt-6 mb-3">{children}</h2>,
-                h2: ({children}) => <h2 className="text-2xl font-bold mt-6 mb-3">{children}</h2>,
+                h2: ({children}) => {
+                  const text = typeof children === 'string' ? children : children?.toString() || '';
+                  const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                  return <h2 id={id} className="text-2xl font-bold mt-6 mb-3">{children}</h2>;
+                },
                 h3: ({children}) => <h3 className="text-xl font-semibold mt-4 mb-2">{children}</h3>,
                 p: ({children}) => <p className="mb-4 leading-relaxed">{children}</p>,
                 ul: ({children}) => <ul className="list-disc pl-6 mb-4">{children}</ul>,
@@ -244,6 +276,9 @@ const BlogPost = () => {
             </Button>
           </div>
         </div>
+
+        {/* Related Posts */}
+        <RelatedPosts currentPost={post} allPosts={posts} />
       </article>
       
       <Footer />
